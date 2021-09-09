@@ -20,30 +20,35 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 		if (!fetched) {
 			// fetch all subject data
 			["radical", "kanji", "vocabulary"].forEach(type => {
-				chrome.storage.local.get(["last"+type+"update"], result => {
-					const date = result["last"+type+"update"];
-					const page = "https://api.wanikani.com/v2/subjects?types="+type;
-					if (date) {
-						modifiedSince(apiKey, date, page)
-							.then(modified => {
-								if (modified) {
-									fetchAllPages(apiKey, page)
-										.then(data => {
-											saveSubjectInfo(data);
-											chrome.storage.local.set({["last_"+type+"_update"]:formatDate(new Date())});
-										})
-										.catch(errorHandling);
-								}
-							})
-							.catch(errorHandling);
-					}
-					else {
-						fetchAllPages(apiKey, page)
-							.then(data => {
-								saveSubjectInfo(data);
-								chrome.storage.local.set({["last_"+type+"_update"]:formatDate(new Date())});
-							})
-							.catch(errorHandling);
+				chrome.storage.local.get(["last"+type+"update", "api_key"], result => {
+					const apiKey = result["api_key"];
+					if (apiKey) {
+						const date = result["last"+type+"update"];
+						const page = "https://api.wanikani.com/v2/subjects?types="+type;
+						if (date) {
+							modifiedSince(apiKey, date, page)
+								.then(modified => {
+									if (modified) {
+										console.log("modiefied; fetching...");
+										fetchAllPages(apiKey, page)
+											.then(data => {
+												saveSubjectInfo(data);
+												chrome.storage.local.set({["last_"+type+"_update"]:formatDate(new Date())});
+											})
+											.catch(errorHandling);
+									}
+								})
+								.catch(errorHandling);
+						}
+						else {
+							console.log("no data; fetching...");
+							fetchAllPages(apiKey, page)
+								.then(data => {
+									saveSubjectInfo(data);
+									chrome.storage.local.set({["last_"+type+"_update"]:formatDate(new Date())});
+								})
+								.catch(errorHandling);
+						}	
 					}
 				});
 			});
