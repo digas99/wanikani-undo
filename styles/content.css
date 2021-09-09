@@ -1,0 +1,4 @@
+/* additional button */
+.icon-undo::before {
+	content: "\238C";
+}
