@@ -1,0 +1,27 @@
+{
+    "name": "WaniKani Undo",
+    "description": "Undo your wrong reviews at Wanikani",
+    "version": "0.1.0",
+    "manifest_version": 2,
+    "icons": {
+        "16":  "logo/logo_bb_16x16.png",
+        "32":  "logo/logo_bb_32x32.png",
+        "48":  "logo/logo_bb_48x48.png",
+        "128": "logo/logo_bb.png"
+    },
+    "background": {
+        "scripts": ["scripts/background.js"]
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://www.wanikani.com/review/session"],
+            "js": ["scripts/content.js"]
+        }
+    ],
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "storage"
+    ]
+}
