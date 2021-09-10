@@ -155,6 +155,16 @@
 							if (document.activeElement === cloneInput)
 								cloneInput.value = cloneInput.value.slice(0,-1);
 						}
+
+						if (key == 'u' || key == 'U') {
+							console.log("here");
+							var clickEvent = new MouseEvent("click", {
+								"view": window,
+								"bubbles": true,
+								"cancelable": false
+							});
+							document.getElementById("option-undo").getElementsByTagName("SPAN")[0].dispatchEvent(clickEvent);
+						}
 					});
 		
 					// add clones
@@ -183,7 +193,7 @@
 							if (!li.classList.contains("disabled") && sendClicks == 1) {
 								resetClones();
 								li.classList.add("disabled");
-								cloneInput.focus();
+								setTimeout(() => cloneInput.focus(), 200);
 							}
 						});
 						const i = document.createElement("i");
