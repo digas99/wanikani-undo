@@ -1,7 +1,7 @@
 'use strict';
 
 (() => {		
-	let questionType, character;
+	let questionType, character, prefix;
 	let sendClicks = 0;
 
 	// get input and button
@@ -29,6 +29,8 @@
 					// extra info fetched here, to make sure everything is loaded
 					questionType = document.getElementById("question-type").classList[0];
 					character = document.getElementById("character").getElementsByTagName("SPAN")[0].innerText;
+					prefix = document.getElementById("question-type").children[0].innerText.split(" ")[0][0].toLowerCase();
+					console.log(prefix);
 				}
 
 				// change text to kana
@@ -49,8 +51,8 @@
 				const value = cloneInput.value;
 				// if ready to check answer
 				if (value != '' && questionType && character) {
-					chrome.storage.local.get([character], result => {
-						const subjectInfo = result[character];
+					chrome.storage.local.get([prefix+character], result => {
+						const subjectInfo = result[prefix+character];
 						console.log(subjectInfo);
 						if (subjectInfo) {
 							const mapInfo = type => {

@@ -1,12 +1,12 @@
 let fetched = false;
 
-const saveSubjectInfo = data => {
+const saveSubjectInfo = (data, prefix) => {
 	data.map(content => content.data)
 		.flat(1)
 		.map(content => content.data)
 		.forEach(subject => {
 			chrome.storage.local.set(
-				{[subject.characters]:{
+				{[prefix+subject.characters]:{
 					"meanings":subject.meanings,
 					"readings":subject.readings
 				}}
@@ -32,7 +32,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 										console.log("modiefied; fetching...");
 										fetchAllPages(apiKey, page)
 											.then(data => {
-												saveSubjectInfo(data);
+												saveSubjectInfo(data, type[0]);
 												chrome.storage.local.set({["last_"+type+"_update"]:formatDate(new Date())});
 											})
 											.catch(errorHandling);
@@ -44,7 +44,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 							console.log("no data; fetching...");
 							fetchAllPages(apiKey, page)
 								.then(data => {
-									saveSubjectInfo(data);
+									saveSubjectInfo(data, type[0]);
 									chrome.storage.local.set({["last_"+type+"_update"]:formatDate(new Date())});
 								})
 								.catch(errorHandling);
