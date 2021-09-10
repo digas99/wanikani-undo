@@ -20,7 +20,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 		if (!fetched) {
 			// fetch all subject data
 			["radical", "kanji", "vocabulary"].forEach(type => {
-				chrome.storage.local.get(["last"+type+"update", "api_key"], result => {
+				chrome.storage.local.get(["last"+type+"update", "api_key", "extension-disabled"], result => {
 					const apiKey = result["api_key"];
 					if (apiKey) {
 						const date = result["last"+type+"update"];
@@ -49,6 +49,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 								})
 								.catch(errorHandling);
 						}	
+
+						const extensionDisabled = result["extension-disabled"];
+						if (!extensionDisabled)
+							chrome.storage.local.set({"extension-disabled":false});
 					}
 				});
 			});

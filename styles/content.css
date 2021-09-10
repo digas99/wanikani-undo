@@ -13,3 +13,22 @@
     font-size: 1.5em;
     border: none;
 }
+
+#wkundo-extension-disable {
+    width: 20px;
+    margin-bottom: -4px !important;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#wkundo-extension-disable:hover {
+    filter: blur(1px);
+}
+
+.wkundo-disabled {
+    opacity: 0.5;
+}
+
+.wkundo-disabled:hover {
+    opacity: 1;
+}
