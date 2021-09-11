@@ -5,6 +5,26 @@
 		const apiKey = result["api_key"];
 		const extensionDisabled = result["extension-disabled"];
 		if (apiKey) {
+			chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+				// if background is fetching data
+				if (request.fetchData) {
+					const backgroundMask = document.createElement("div");
+					document.body.appendChild(backgroundMask);
+					backgroundMask.id = "wkundo-backgroundMask";
+
+					const dataLoadingWrapper = document.createElement("div");
+					document.body.appendChild(dataLoadingWrapper);
+					dataLoadingWrapper.id = "wkundo-dataLoading";
+					const dataLoading = document.createElement("div");
+					dataLoadingWrapper.appendChild(dataLoading);
+
+					backgroundMask.addEventListener("click", () => {
+						backgroundMask.remove();
+						dataLoadingWrapper.remove();
+					});
+				}
+			});
+
 			// extension disable button
 			const stats = document.getElementById("stats");
 			if (stats) {
