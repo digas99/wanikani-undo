@@ -1,28 +1,26 @@
 let checked = false;
-let fetched = false;
-console.log("new script");
 
 const saveSubjectInfo = (data, prefix) => {
+	let info = {};
 	data.map(content => content.data)
 		.flat(1)
 		.map(content => content.data)
-		.forEach(subject => {
-			chrome.storage.local.set(
-				{[prefix+subject.characters]:{
-					"meanings":subject.meanings,
-					"readings":subject.readings
-				}}
-			);
-			console.log("saving");
+		.forEach((subject) => {
+			info[prefix+subject.characters] = {
+				"meanings":subject.meanings,
+				"readings":subject.readings
+			};
 		});
+
+	chrome.storage.local.set(info);
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 	// if user is at reviews
 	if (tabInfo.url == "https://www.wanikani.com/review/session" || tabInfo.url == "https://www.wanikani.com/review") {
-		console.log("again ", checked, fetched);
-		console.log(tabId);
-		chrome.tabs.sendMessage(tabId, {fetchData:fetched});
+		console.log("again ", checked);
+		// chrome.tabs.sendMessage(tabId, {fetchData:fetched});
+
 		if (!checked) {
 			chrome.storage.local.get(["api_key", "extension-disabled"], info => {
 				const apiKey = info["api_key"];
@@ -42,7 +40,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 								modifiedSince(apiKey, date, page)
 									.then(modified => {
 										if (modified) {
-											fetched = true;
 											console.log("modiefied; fetching...");
 											fetchAllPages(apiKey, page)
 												.then(data => {
@@ -56,7 +53,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tabInfo) => {
 							}
 							else {
 								console.log("no data; fetching...");
-								fetched = true;
 								fetchAllPages(apiKey, page)
 									.then(data => {
 										saveSubjectInfo(data, type[0]);

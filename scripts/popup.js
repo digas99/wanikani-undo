@@ -271,3 +271,9 @@ document.addEventListener("click", e => {
 		document.documentElement.style.setProperty('--body-base-width', '250px');
 	}
 });
+
+document.addEventListener("keydown", e => {
+	const key = e.key;
+
+	if (key == 'Enter') submitAction();
+});

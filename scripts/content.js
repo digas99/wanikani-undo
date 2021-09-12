@@ -2,28 +2,35 @@
 
 (() => {	
 	chrome.storage.local.get(["api_key", "extension-disabled"], result => {
+		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+			if (request.reloadPage)
+				window.location.reload();
+		});
+
 		const apiKey = result["api_key"];
 		const extensionDisabled = result["extension-disabled"];
 		if (apiKey) {
-			chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-				// if background is fetching data
-				if (request.fetchData) {
-					const backgroundMask = document.createElement("div");
-					document.body.appendChild(backgroundMask);
-					backgroundMask.id = "wkundo-backgroundMask";
+			// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+			// 	// if background is fetching data
+			// 	if (request.fetchData) {
+			// 		const backgroundMask = document.createElement("div");
+			// 		document.body.appendChild(backgroundMask);
+			// 		backgroundMask.id = "wkundo-backgroundMask";
 
-					const dataLoadingWrapper = document.createElement("div");
-					document.body.appendChild(dataLoadingWrapper);
-					dataLoadingWrapper.id = "wkundo-dataLoading";
-					const dataLoading = document.createElement("div");
-					dataLoadingWrapper.appendChild(dataLoading);
+			// 		const dataLoadingWrapper = document.createElement("div");
+			// 		document.body.appendChild(dataLoadingWrapper);
+			// 		dataLoadingWrapper.id = "wkundo-dataLoading";
+			// 		const dataLoading = document.createElement("div");
+			// 		dataLoadingWrapper.appendChild(dataLoading);
 
-					backgroundMask.addEventListener("click", () => {
-						backgroundMask.remove();
-						dataLoadingWrapper.remove();
-					});
-				}
-			});
+			// 		backgroundMask.addEventListener("click", () => {
+			// 			backgroundMask.remove();
+			// 			dataLoadingWrapper.remove();
+			// 		});
+			// 	}
+
+			// 	if (request.fetchedAll) console.log("Fetched all: "+request.fetchedAll);
+			// });
 
 			// extension disable button
 			const stats = document.getElementById("stats");
@@ -40,32 +47,20 @@
 					if (!(logo.classList.contains("wkundo-disabled"))) {
 						logo.classList.add("wkundo-disabled");
 						disabled = true;
-						const undoButton = document.getElementById("option-undo");
-						if (undoButton && undoButton.parentElement) {
-							undoButton.parentElement.childNodes.forEach(node => node.style.removeProperty('width'));
-							undoButton.remove();
-						}
-						const undoInput = document.getElementById("wkundo-input");
-						if (undoInput) undoInput.remove();
-						const undoSend = document.getElementById("wkundo-sendbutton");
-						if (undoSend) undoSend.remove();
-
-						const realInput = document.getElementById("user-response");
-						if (realInput) realInput.style.removeProperty('display');
-						const realButton = realInput.parentElement.getElementsByTagName("BUTTON")[0];
-						if (realButton) realButton.style.removeProperty('display');
+						
+						removeExtensionContent();
 					}
 					else {
 						logo.classList.remove("wkundo-disabled");
 						disabled = false;
 
-						setupPage();
+						setupExtensionContent();
 					}
 					chrome.storage.local.set({"extension-disabled":disabled});
 				});
 			}
 
-			const setupPage = () => {
+			const setupExtensionContent = () => {
 				let questionType, character, prefix;
 				let sendClicks = 0;
 			
@@ -125,7 +120,9 @@
 							if (value != '' && questionType && character) {
 								sendClicks++;
 			
+								console.log("info: ", prefix, character);
 								chrome.storage.local.get([prefix+character], result => {
+									console.log(result);
 									const subjectInfo = result[prefix+character];
 									console.log(subjectInfo);
 									if (subjectInfo) {
@@ -229,6 +226,24 @@
 								if (optionUndo)
 									optionUndo.getElementsByTagName("SPAN")[0].dispatchEvent(clickEvent);
 							}
+
+							// if (key == 'x' || key == 'X') {
+							// 	const logo = document.getElementById("wkundo-extension-disable");
+							// 	let disabled;
+							// 	if (!(logo.classList.contains("wkundo-disabled"))) {
+							// 		logo.classList.add("wkundo-disabled");
+							// 		disabled = true;
+									
+							// 		removeExtensionContent();
+							// 	}
+							// 	else {
+							// 		logo.classList.remove("wkundo-disabled");
+							// 		disabled = false;
+
+							// 		setupExtensionContent();
+							// 	}
+							// 	chrome.storage.local.set({"extension-disabled":disabled});
+							// }
 						});
 			
 						// add clones
@@ -265,14 +280,49 @@
 							i.classList.add("icon-undo");
 			
 							// fix all buttons width
-							buttonsWrapper.childNodes.forEach(btn => btn.style.width = "16%");
+							buttonsWrapper.childNodes.forEach(btn => btn.style.width = (100/buttonsWrapper.childNodes.length)+"%");
+						}
+
+						// answer eval warning
+						const informationElem = document.getElementById("information");
+						if (informationElem) {
+							const wrapper = document.createElement("div");
+							wrapper.id = "wk-undo-ans-eval-info";
+							const nextSibling = informationElem.nextSibling;
+							if (nextSibling)
+								informationElem.parentElement.insertBefore(wrapper, nextSibling);
+							else
+								informationElem.parentElement.appendChild(wrapper);
+							const msg = document.createElement("p");
+							wrapper.appendChild(msg);
+							msg.appendChild(document.createTextNode("The evaluation of a correct answer with WaniKani Undo activated might not be exactly the same as WaniKani's. It is pretty similar, though."));
 						}
 					}
 				}
 			}
 
+			const removeExtensionContent = () => {
+				const undoButton = document.getElementById("option-undo");
+				if (undoButton && undoButton.parentElement) {
+					undoButton.parentElement.childNodes.forEach(node => node.style.removeProperty('width'));
+					undoButton.remove();
+				}
+				const undoInput = document.getElementById("wkundo-input");
+				if (undoInput) undoInput.remove();
+				const undoSend = document.getElementById("wkundo-sendbutton");
+				if (undoSend) undoSend.remove();
+
+				const realInput = document.getElementById("user-response");
+				if (realInput) realInput.style.removeProperty('display');
+				const realButton = realInput.parentElement.getElementsByTagName("BUTTON")[0];
+				if (realButton) realButton.style.removeProperty('display');
+
+				const ansEvalMsg = document.getElementById("wk-undo-ans-eval-info");
+				if (ansEvalMsg) ansEvalMsg.remove();
+			}
+
 			if (!extensionDisabled) {
-				setupPage();
+				setupExtensionContent();
 			}
 		}
 	});
