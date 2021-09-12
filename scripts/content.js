@@ -1,329 +1,304 @@
 'use strict';
 
 (() => {	
-	chrome.storage.local.get(["api_key", "extension-disabled"], result => {
+	chrome.storage.local.get(["extension-disabled"], result => {
 		chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 			if (request.reloadPage)
 				window.location.reload();
 		});
 
-		const apiKey = result["api_key"];
 		const extensionDisabled = result["extension-disabled"];
-		if (apiKey) {
-			// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-			// 	// if background is fetching data
-			// 	if (request.fetchData) {
-			// 		const backgroundMask = document.createElement("div");
-			// 		document.body.appendChild(backgroundMask);
-			// 		backgroundMask.id = "wkundo-backgroundMask";
 
-			// 		const dataLoadingWrapper = document.createElement("div");
-			// 		document.body.appendChild(dataLoadingWrapper);
-			// 		dataLoadingWrapper.id = "wkundo-dataLoading";
-			// 		const dataLoading = document.createElement("div");
-			// 		dataLoadingWrapper.appendChild(dataLoading);
+		// element that will receive the result of the answer evaluation
+		const ansEvalDiv = document.createElement("div");
+		document.documentElement.appendChild(ansEvalDiv);
+		ansEvalDiv.style.display = "none";
+		ansEvalDiv.id = "wkundo-result";
 
-			// 		backgroundMask.addEventListener("click", () => {
-			// 			backgroundMask.remove();
-			// 			dataLoadingWrapper.remove();
-			// 		});
-			// 	}
-
-			// 	if (request.fetchedAll) console.log("Fetched all: "+request.fetchedAll);
-			// });
-
-			// extension disable button
-			const stats = document.getElementById("stats");
-			if (stats) {
-				const i = document.createElement("i");
-				stats.appendChild(i);
-				const logo = document.createElement("img");
-				i.appendChild(logo);
-				logo.id = "wkundo-extension-disable";
-				logo.src = "https://i.imgur.com/NYZNega.png";
-				if (extensionDisabled) logo.classList.add("wkundo-disabled");
-				logo.addEventListener("click", () => {
-					let disabled;
-					if (!(logo.classList.contains("wkundo-disabled"))) {
-						logo.classList.add("wkundo-disabled");
-						disabled = true;
-						
-						removeExtensionContent();
-					}
-					else {
+		// extension disable button
+		const stats = document.getElementById("stats");
+		if (stats) {
+			const i = document.createElement("i");
+			stats.appendChild(i);
+			const logo = document.createElement("img");
+			i.appendChild(logo);
+			logo.id = "wkundo-extension-disable";
+			logo.src = "https://i.imgur.com/NYZNega.png";
+			if (extensionDisabled) logo.classList.add("wkundo-disabled");
+			logo.addEventListener("click", () => {
+				let disabled;
+				if (!logo.classList.contains("wkundo-disabled") && !document.getElementById("wkundo-input").style.backgroundColor) {
+					logo.classList.add("wkundo-disabled");
+					disabled = true;
+					
+					removeExtensionContent();
+				}
+				else {
+					if (logo.classList.contains("wkundo-disabled") && !document.getElementById("user-response").style.backgroundColor) {
 						logo.classList.remove("wkundo-disabled");
 						disabled = false;
 
 						setupExtensionContent();
-					}
+					}	
+				}
+		
+				if (disabled !== undefined)
 					chrome.storage.local.set({"extension-disabled":disabled});
-				});
-			}
+			});
+			
+			logo.addEventListener("mouseover", () => {
+				if ((document.getElementById("wkundo-input") && document.getElementById("wkundo-input").style.backgroundColor)
+					|| (document.getElementById("user-response") && document.getElementById("user-response").style.backgroundColor)) logo.style.cursor = "not-allowed";
+				else logo.style.removeProperty("cursor");
+			});
+		}
 
-			const setupExtensionContent = () => {
-				let questionType, character, prefix;
-				let sendClicks = 0;
-			
-				// get input and button
-				const input = document.getElementById("user-response");
-				if (input) {
-					const parent = input.parentElement;
-					const btn = parent.getElementsByTagName("BUTTON")[0];
-					if (btn) {
-						const cloneInput = input.cloneNode();
-						cloneInput.id = "wkundo-input";
-						const cloneBtn = document.createElement("div");
-						cloneBtn.id = "wkundo-sendbutton";
-						const cloneBtnChild = btn.childNodes[0].cloneNode();
-						cloneBtnChild.style.pointerEvents = "none";
-						cloneBtn.appendChild(cloneBtnChild);
-			
-						const resetClones = () => {
-							cloneInput.style.backgroundColor = "#fff";
-							cloneInput.style.color = "black";
-							cloneInput.value = "";
-							cloneInput.style.pointerEvents = "all";
-							cloneBtn.style.backgroundColor = "#fff";
-							cloneBtn.style.color = "black";
-							sendClicks = 0;
-						}
-			
-						const updateBasicInfo = () => {
-							questionType = document.getElementById("question-type").classList[0];
-							character = document.getElementById("character").getElementsByTagName("SPAN")[0].innerText;
-							prefix = document.getElementById("question-type").children[0].innerText.split(" ")[0][0].toLowerCase();
-							console.log(questionType);
-							console.log(character);
-							console.log(prefix);
-						}
-			
-						cloneInput.addEventListener("input", () => {
-							// extra info fetched here, to make sure everything is loaded
-							if (!(questionType && character))
-								updateBasicInfo();
-			
-							// change text to kana
-							if (questionType == "reading") {
-								let finalValue = "";
-								const split = separateRomaji(cloneInput.value);
-								for (const word of split) {
-									const kanaValue = kana[word];
-									finalValue += kanaValue ? kanaValue : word;
-								}
-								cloneInput.value = finalValue;
+		const setupExtensionContent = () => {
+			let questionType;
+			let sendClicks = 0;
+		
+			// get input and button
+			const input = document.getElementById("user-response");
+			if (input) {
+				const parent = input.parentElement;
+				const btn = parent.getElementsByTagName("BUTTON")[0];
+				if (btn) {
+					const cloneInput = input.cloneNode();
+					cloneInput.id = "wkundo-input";
+					const cloneBtn = document.createElement("div");
+					cloneBtn.id = "wkundo-sendbutton";
+					cloneBtn.style.backgroundColor = input.style.backgroundColor;
+					cloneBtn.style.color = input.style.color;
+					const cloneBtnChild = btn.childNodes[0].cloneNode();
+					cloneBtnChild.style.pointerEvents = "none";
+					cloneBtn.appendChild(cloneBtnChild);
+		
+					const resetClones = () => {
+						cloneInput.style.removeProperty("background-color");
+						cloneInput.style.removeProperty("color");
+						cloneInput.value = "";
+						cloneInput.style.pointerEvents = "all";
+						cloneBtn.style.removeProperty("background-color");
+						cloneBtn.style.removeProperty("color");
+						sendClicks = 0;
+					}
+		
+					const updateBasicInfo = () => {
+						questionType = document.getElementById("question-type").classList[0];
+						console.log(questionType);
+					}
+		
+					cloneInput.addEventListener("input", () => {
+						// extra info fetched here, to make sure everything is loaded
+						if (!(questionType))
+							updateBasicInfo();
+		
+						// change text to kana
+						if (questionType == "reading") {
+							let finalValue = "";
+							const split = separateRomaji(cloneInput.value);
+							for (const word of split) {
+								const kanaValue = kana[word];
+								finalValue += kanaValue ? kanaValue : word;
 							}
-						});
-			
-						const sendAction = () => {
-							const value = cloneInput.value.toLowerCase();
-							// if ready to check answer
-							if (value != '' && questionType && character) {
-								sendClicks++;
-			
-								console.log("info: ", prefix, character);
-								chrome.storage.local.get([prefix+character], result => {
-									console.log(result);
-									const subjectInfo = result[prefix+character];
-									console.log(subjectInfo);
-									if (subjectInfo) {
-										const mapInfo = type => {
-											return subjectInfo[type+"s"]
-												.filter(data => data["accepted_answer"])
-												.map(data => data[type]);
-										}
-			
-										// map answers and put all in lower case
-										let info = mapInfo(questionType).map(value => value.toLowerCase());
-			
-										// correct answer
-										// - checking if the answer is exactly the same
-										// - using levenshtein distance to accept aproximate answers
-										if (info.includes(value) || (questionType != "reading" && info.some(answer => length_condition(levenshtein(answer, value), answer.length)))) {
-											if (sendClicks == 1) {
-												cloneInput.style.backgroundColor = "#88cc00";
-												cloneBtn.style.backgroundColor = "#88cc00";
-												cloneInput.style.color = "#fff";
-												cloneBtn.style.color = "#fff";
-			
-												// the answer to be sent is something that is always right (not the user's answer),
-												// to prevent conflicts with the wanikani's evaluation system. This only applies for
-												// meanings, because of the answer acceptance method
-												input.value = questionType == "meaning" ? info[0] : value;
-			
-												// play audio
-												document.getElementById("option-audio-player").click();
-											}			
-			
-											btn.click();
-			
-											if (sendClicks == 2) {
-												resetClones();
-												updateBasicInfo();
-											}					
-										}
-										// incorrect answer
-										else {
-											// first send, give the option to undo
-											if (sendClicks == 1) {
-												document.getElementById("option-undo").classList.remove("disabled");
-			
-												cloneInput.style.backgroundColor = "#f03";
-												cloneInput.style.pointerEvents = "none";
-												cloneInput.style.color = "#fff";
-												cloneInput.blur();
-												cloneBtn.style.backgroundColor = "#f03";
-												cloneBtn.style.color = "#fff";
-											}
-											// if user confirms that the answer is wrong
-											else {
-												// put the answer in the real input and click the real button
-												if (sendClicks == 2) {
-													// the answer to be sent is something that is always wrong (not the user's answer),
-													// to prevent conflicts with the wanikani's evaluation system. This only applies
-													// for meanings
-													input.value = questionType == "meaning" ? "wasd" : value;
-													// prevent user from going back
-													document.getElementById("option-undo").classList.add("disabled");
-												}
-			
-												btn.click();
-			
-												// if user clicked 3 times while wrong, then reset styles for the next review
-												if (sendClicks == 3) {
-													resetClones();
-													updateBasicInfo();
-												}
-											}
-										}
-									}
-								});
-							}
+							cloneInput.value = finalValue;
 						}
-			
-						cloneBtn.addEventListener("click", sendAction);
-			
-						document.addEventListener("keydown", e => {
-							const key = e.key;
-			
-							if (document.getElementById("wkundo-sendbutton") && key == 'Enter')
-								sendAction();
-			
-							// force char deleting with backspace
-							if (key == "Backspace") {
-								// make sure the user is writing in the clone button
-								if (document.getElementById("wkundo-input") && document.activeElement === cloneInput)
-									cloneInput.value = cloneInput.value.slice(0,-1);
-							}
-	
-							if (key == 'u' || key == 'U') {
-								console.log("here");
-								var clickEvent = new MouseEvent("click", {
-									"view": window,
-									"bubbles": true,
-									"cancelable": false
-								});
-								const optionUndo = document.getElementById("option-undo");
-								if (optionUndo)
-									optionUndo.getElementsByTagName("SPAN")[0].dispatchEvent(clickEvent);
+					});
+		
+					const sendAction = () => {
+						const value = cloneInput.value.toLowerCase();
+						// if ready to check answer
+						console.log("send");
+						if (value != '') {
+							sendClicks++;
+
+							const ansEval = () => {
+								console.log(document.getElementById("wkundo-input").value);
+								console.log(document.getElementById("question-type").classList[0]);
+								const result = window.answerChecker.evaluate(document.getElementById("question-type").classList[0], document.getElementById("wkundo-input").value).passed;
+								console.log(result);
+								const div = document.getElementById("wkundo-result");
+								div.innerText = result;
 							}
 
-							// if (key == 'x' || key == 'X') {
-							// 	const logo = document.getElementById("wkundo-extension-disable");
-							// 	let disabled;
-							// 	if (!(logo.classList.contains("wkundo-disabled"))) {
-							// 		logo.classList.add("wkundo-disabled");
-							// 		disabled = true;
-									
-							// 		removeExtensionContent();
-							// 	}
-							// 	else {
-							// 		logo.classList.remove("wkundo-disabled");
-							// 		disabled = false;
+							// script to call evaluation function from wanikani
+							const script = document.createElement("script");
+							script.text = `(${ansEval.toString()})();`;
+							script.id = "wkundo-evalScript";
+							const oldScript = document.getElementById("wkundo-evalScript");
+							if (oldScript) oldScript.remove();
+							document.documentElement.appendChild(script);
+							
+							const evalResult = document.getElementById("wkundo-result").innerText == "false" ? false : true;
+							if (evalResult) {
+								if (sendClicks == 1) {
+									cloneInput.style.backgroundColor = "#88cc00";
+									cloneBtn.style.backgroundColor = "#88cc00";
+									cloneInput.style.color = "#fff";
+									cloneBtn.style.color = "#fff";
 
-							// 		setupExtensionContent();
-							// 	}
-							// 	chrome.storage.local.set({"extension-disabled":disabled});
-							// }
-						});
-			
-						// add clones
-						parent.appendChild(cloneInput);
-						parent.appendChild(cloneBtn);
-			
-						// hide original elements
-						input.style.display = "none";
-						btn.style.display = "none";
-			
-						// additional button
-						const buttonsWrapper = document.getElementById("additional-content").getElementsByTagName("UL")[0];
-						if (buttonsWrapper) {
-							buttonsWrapper.style.textAlign = "center";
-			
-							// add undo button
-							const li = document.createElement("li");
-							buttonsWrapper.appendChild(li);
-							li.classList.add("disabled");
-							li.id = "option-undo";
-							const span = document.createElement("span");
-							li.appendChild(span);
-							span.title = "Undo";
-							// event listener to undo button
-							span.addEventListener("click", () => {
-								if (!li.classList.contains("disabled") && sendClicks == 1) {
+									input.value = value;
+
+									// play audio
+									document.getElementById("option-audio-player").click();
+								}			
+
+								btn.click();
+
+								if (sendClicks == 2) {
 									resetClones();
-									li.classList.add("disabled");
-									setTimeout(() => cloneInput.focus(), 200);
-								}
-							});
-							const i = document.createElement("i");
-							span.appendChild(i);
-							i.classList.add("icon-undo");
-			
-							// fix all buttons width
-							buttonsWrapper.childNodes.forEach(btn => btn.style.width = (100/buttonsWrapper.childNodes.length)+"%");
-						}
+									updateBasicInfo();
+								}					
+							}
+							// incorrect answer
+							else {
+								// first send, give the option to undo
+								if (sendClicks == 1) {
+									document.getElementById("option-undo").classList.remove("disabled");
 
-						// answer eval warning
-						const informationElem = document.getElementById("information");
-						if (informationElem) {
-							const wrapper = document.createElement("div");
-							wrapper.id = "wk-undo-ans-eval-info";
-							const nextSibling = informationElem.nextSibling;
-							if (nextSibling)
-								informationElem.parentElement.insertBefore(wrapper, nextSibling);
-							else
-								informationElem.parentElement.appendChild(wrapper);
-							const msg = document.createElement("p");
-							wrapper.appendChild(msg);
-							msg.appendChild(document.createTextNode("The evaluation of a correct answer with WaniKani Undo activated might not be exactly the same as WaniKani's. It is pretty similar, though."));
+									cloneInput.style.backgroundColor = "#f03";
+									cloneInput.style.pointerEvents = "none";
+									cloneInput.style.color = "#fff";
+									cloneInput.blur();
+									cloneBtn.style.backgroundColor = "#f03";
+									cloneBtn.style.color = "#fff";
+								}
+								// if user confirms that the answer is wrong
+								else {
+									// put the answer in the real input and click the real button
+									if (sendClicks == 2) {
+										input.value = value;
+										// prevent user from going back
+										document.getElementById("option-undo").classList.add("disabled");
+									}
+
+									btn.click();
+
+									// if user clicked 3 times while wrong, then reset styles for the next review
+									if (sendClicks == 3) {
+										resetClones();
+										updateBasicInfo();
+									}
+								}
+							}
 						}
 					}
+
+					cloneBtn.addEventListener("click", sendAction);
+		
+					// add clones
+					parent.appendChild(cloneInput);
+					parent.appendChild(cloneBtn);
+		
+					// hide original elements
+					input.style.display = "none";
+					btn.style.display = "none";
+		
+					// additional button
+					const buttonsWrapper = document.getElementById("additional-content").getElementsByTagName("UL")[0];
+					if (buttonsWrapper) {
+						buttonsWrapper.style.textAlign = "center";
+		
+						// add undo button
+						const li = document.createElement("li");
+						buttonsWrapper.appendChild(li);
+						li.classList.add("disabled");
+						li.id = "option-undo";
+						const span = document.createElement("span");
+						li.appendChild(span);
+						span.title = "Undo";
+						// event listener to undo button
+						span.addEventListener("click", () => {
+							if (!li.classList.contains("disabled") && sendClicks == 1) {
+								resetClones();
+								li.classList.add("disabled");
+								setTimeout(() => cloneInput.focus(), 200);
+							}
+						});
+						const i = document.createElement("i");
+						span.appendChild(i);
+						i.classList.add("icon-undo");
+		
+						// fix all buttons width
+						buttonsWrapper.childNodes.forEach(btn => btn.style.width = (100/buttonsWrapper.childNodes.length)+"%");
+					}
+
+					document.addEventListener("keydown", e => {
+						const key = e.key;
+
+						if (document.getElementById("wkundo-sendbutton") && key == 'Enter')
+							sendAction();
+
+											// force char deleting with backspace
+						if (key == "Backspace") {
+							// make sure the user is writing in the clone button
+							if (document.getElementById("wkundo-input") && document.activeElement === cloneInput)
+								cloneInput.value = cloneInput.value.slice(0,-1);
+						}
+					});
 				}
-			}
-
-			const removeExtensionContent = () => {
-				const undoButton = document.getElementById("option-undo");
-				if (undoButton && undoButton.parentElement) {
-					undoButton.parentElement.childNodes.forEach(node => node.style.removeProperty('width'));
-					undoButton.remove();
-				}
-				const undoInput = document.getElementById("wkundo-input");
-				if (undoInput) undoInput.remove();
-				const undoSend = document.getElementById("wkundo-sendbutton");
-				if (undoSend) undoSend.remove();
-
-				const realInput = document.getElementById("user-response");
-				if (realInput) realInput.style.removeProperty('display');
-				const realButton = realInput.parentElement.getElementsByTagName("BUTTON")[0];
-				if (realButton) realButton.style.removeProperty('display');
-
-				const ansEvalMsg = document.getElementById("wk-undo-ans-eval-info");
-				if (ansEvalMsg) ansEvalMsg.remove();
-			}
-
-			if (!extensionDisabled) {
-				setupExtensionContent();
 			}
 		}
+
+		const removeExtensionContent = () => {
+			const undoButton = document.getElementById("option-undo");
+			if (undoButton && undoButton.parentElement) {
+				undoButton.parentElement.childNodes.forEach(node => node.style.removeProperty('width'));
+				undoButton.remove();
+			}
+			const undoInput = document.getElementById("wkundo-input");
+			if (undoInput) undoInput.remove();
+			const undoSend = document.getElementById("wkundo-sendbutton");
+			if (undoSend) undoSend.remove();
+
+			const realInput = document.getElementById("user-response");
+			if (realInput) realInput.style.removeProperty('display');
+			const realButton = realInput.parentElement.getElementsByTagName("BUTTON")[0];
+			if (realButton) realButton.style.removeProperty('display');
+		}
+
+		if (!extensionDisabled) {
+			setupExtensionContent();
+		}
+
+		document.addEventListener("keydown", e => {
+			const key = e.key;
+
+			// if (key !== "Backspace" && e.repeat) return;
+
+			if (key == 'u' || key == 'U') {
+				console.log("here");
+				var clickEvent = new MouseEvent("click", {
+					"view": window,
+					"bubbles": true,
+					"cancelable": false
+				});
+				const optionUndo = document.getElementById("option-undo");
+				if (optionUndo)
+					optionUndo.getElementsByTagName("SPAN")[0].dispatchEvent(clickEvent);
+			}
+
+			if (key == 'x' || key == 'X') {
+				const logo = document.getElementById("wkundo-extension-disable");
+				let disabled;
+				if (!logo.classList.contains("wkundo-disabled") && !document.getElementById("wkundo-input").style.backgroundColor) {
+					logo.classList.add("wkundo-disabled");
+					disabled = true;
+					
+					removeExtensionContent();
+				}
+				else {
+					if (logo.classList.contains("wkundo-disabled") && !document.getElementById("user-response").style.backgroundColor) {
+						logo.classList.remove("wkundo-disabled");
+						disabled = false;
+
+						setupExtensionContent();
+					}	
+				}
+		
+				if (disabled) chrome.storage.local.set({"extension-disabled":disabled});
+			}
+		});
+		
 	});
 })();

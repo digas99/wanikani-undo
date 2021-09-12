@@ -118,43 +118,6 @@ window.onload = () => {
 	title.textContent = "WaniKani Undo";
 	logoDiv.appendChild(title);
 
-	chrome.storage.local.get(["api_key"], result => {
-		const apiKey = result["api_key"];
-		// if the user did not add a key yet
-		if (!apiKey) {
-			// key input
-			const apiInputWrapper = document.createElement("div");
-			apiInputWrapper.classList.add("apiKey_wrapper");
-			main.appendChild(apiInputWrapper);
-
-			const apiLabel = document.createElement("p");
-			apiLabel.style.marginBottom = "5px";
-			apiLabel.style.fontSize = "14px";
-			apiLabel.appendChild(document.createTextNode("API Key: "));
-			apiInputWrapper.appendChild(apiLabel);
-		
-			const apiInput = textInput("apiKey", "../images/key.png", "Input the key here...");
-			apiInputWrapper.appendChild(apiInput);
-
-			// submit button
-			const button = document.createElement("div");
-			button.appendChild(document.createTextNode("Submit"));
-			button.classList.add("button");
-			button.id = "submit";
-			apiInputWrapper.appendChild(button);
-
-			// what is an api key
-			const whatIsAPIKey = document.createElement("div");
-			whatIsAPIKey.style.marginTop = "2px";
-			apiInputWrapper.appendChild(whatIsAPIKey);
-			const whatIsAPIKeyLink = document.createElement("a");
-			whatIsAPIKeyLink.href = "#";
-			whatIsAPIKeyLink.id = "whatIsAPIKey";
-			whatIsAPIKeyLink.appendChild(document.createTextNode("What is an API Key?"));
-			whatIsAPIKey.appendChild(whatIsAPIKeyLink);
-		}
-	});
-
 	document.body.appendChild(footer());
 }
 

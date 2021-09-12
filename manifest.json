@@ -10,12 +10,12 @@
         "128": "logo/logo_bb.png"
     },
     "background": {
-        "scripts": ["scripts/background.js", "scripts/functions.js"]
+        "scripts": ["scripts/background.js"]
     },
     "content_scripts": [
         {
             "matches": ["https://www.wanikani.com/review", "https://www.wanikani.com/review/session"],
-            "js": ["scripts/content.js", "scripts/kana.js", "scripts/answer-validation.js"],
+            "js": ["scripts/content.js", "scripts/kana.js"],
             "css": ["styles/content.css"]
         }
     ],
