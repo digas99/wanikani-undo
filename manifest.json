@@ -9,13 +9,10 @@
         "48":  "logo/logo_bb_48x48.png",
         "128": "logo/logo_bb.png"
     },
-    "background": {
-        "scripts": ["scripts/background.js"]
-    },
     "content_scripts": [
         {
-            "matches": ["https://www.wanikani.com/review", "https://www.wanikani.com/review/session"],
-            "js": ["scripts/content.js", "scripts/kana.js"],
+            "matches": ["https://www.wanikani.com/review/session"],
+            "js": ["scripts/content.js", "scripts/kana.js", "scripts/static.js"],
             "css": ["styles/content.css"]
         }
     ],

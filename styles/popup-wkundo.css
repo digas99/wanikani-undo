@@ -1,0 +1,19 @@
+.settings-hotkey:after {
+	font-size: 15px !important;
+}
+
+.disabled-settings {
+	pointer-events: none;
+    opacity: 0.5;
+}
+
+.hotkey-selector {
+	background-color: var(--default-color);
+	color: white;
+}
+
+#typeNewKey-msg {
+	color: var(--default-color);
+    text-align: center;
+    font-weight: 900;
+}

@@ -103,7 +103,7 @@ const secundaryPage = (titleText, width) => {
 window.onload = () => {
 	const main = document.createElement("div");
 	main.id = "main";
-	document.body.appendChild(main);
+	document.body.insertBefore(main, document.body.children[0]);
 
 	// logo
 	const logoDiv = document.createElement("div");
@@ -117,6 +117,35 @@ window.onload = () => {
 	const title = document.createElement("h2");
 	title.textContent = "WaniKani Undo";
 	logoDiv.appendChild(title);
+
+	// setup review session interface checkbox values
+	const settings = ["auto-show-item-info", "two-click-wrong-answer"];
+	chrome.storage.local.get(settings, result => {
+		settings.forEach(id => {
+			let value = result[id];
+			if (value == undefined) {
+				value = false;
+				chrome.storage.local.set({[id]:value});
+			}
+			const checkbox = document.getElementById("settings-"+id);
+			console.log(checkbox);
+			console.log(value);
+			if (checkbox) checkbox.checked = value;
+		});
+	});
+
+	// setup hotkeys
+	chrome.storage.local.get(["hotkeys"], result => {
+		let hotkeys = result["hotkeys"];
+		if (!hotkeys) {
+			hotkeys = static_hotkeysMap;
+			chrome.storage.local.set({"hotkeys":hotkeys});
+		}
+		const hotkeysInputs = document.getElementsByClassName("settings-hotkey");
+		if (hotkeys && hotkeysInputs.length > 0) {
+			Array.from(hotkeysInputs).forEach(input => document.styleSheets[0].insertRule(`#${input.id}:after { content:'${hotkeys[input.id]}';}`));
+		}
+	});
 
 	document.body.appendChild(footer());
 }
@@ -233,10 +262,63 @@ document.addEventListener("click", e => {
 		document.getElementById("footer").style.display = "inherit";
 		document.documentElement.style.setProperty('--body-base-width', '250px');
 	}
+
+
+	if (["settings-auto-show-item-info", "settings-two-click-wrong-answer"].includes(targetElem.id))
+		chrome.storage.local.set({[targetElem.id.split("settings-")[1]]:targetElem.checked ? true : false});
+
+	if (targetElem.classList.contains("settings-hotkey")) {
+		e.preventDefault();
+	
+		document.styleSheets[0].insertRule(`#${targetElem.id}:after { content:'_' !important;}`,document.styleSheets[0].cssRules.length);
+		const settingsOptionsWrapper = document.getElementById("settingsOptionsWrapper");
+		if (settingsOptionsWrapper) settingsOptionsWrapper.style.pointerEvents = "none";
+
+		const wrapper = targetElem.parentElement.parentElement;
+		if (wrapper) wrapper.classList.add("hotkey-selector");
+
+		const superWrapper = document.getElementById("settingsContent");
+		if (superWrapper && !document.getElementById("typeNewKey-msg")) {
+			const hotkeyMsg = document.createElement("p");
+			superWrapper.appendChild(hotkeyMsg);
+			hotkeyMsg.id = "typeNewKey-msg";
+			hotkeyMsg.appendChild(document.createTextNode("Type the new key now"));
+		}
+	}
 });
 
 document.addEventListener("keydown", e => {
 	const key = e.key;
 
 	if (key == 'Enter') submitAction();
+
+	const newHotkeyMsg = document.getElementById("typeNewKey-msg");
+	if (newHotkeyMsg && key.length == 1) {
+		chrome.storage.local.get(["hotkeys"], result => {
+			const hotkeys = result["hotkeys"];
+			if (hotkeys) {
+				newHotkeyMsg.remove();
+				const hotkeySelector = document.getElementsByClassName("hotkey-selector")[0];
+				if (hotkeySelector) {
+					const checkbox = hotkeySelector.getElementsByTagName("INPUT")[0];
+					if (checkbox) document.styleSheets[0].insertRule(`#${checkbox.id}:after { content:'${key.toUpperCase()}' !important;}`, document.styleSheets[0].cssRules.length);
+		
+					const settingsWrapper = document.getElementById("settingsOptionsWrapper");
+					if (settingsWrapper) settingsWrapper.style.removeProperty("pointer-events");
+					hotkeySelector.classList.remove("hotkey-selector");
+		
+					const settingsInputs = document.getElementsByClassName("settingsItemInput");
+					if (settingsInputs) Array.from(settingsInputs).forEach(input => {
+						if (input !== checkbox && window.getComputedStyle(input, ':after').getPropertyValue('content') === '"'+key.toUpperCase()+'"') {
+							document.styleSheets[0].insertRule(`#${input.id}:after { content:' ' !important;}`, document.styleSheets[0].cssRules.length);
+							hotkeys[input.id] = '';
+						}
+					});
+
+					hotkeys[checkbox.id] = key.toUpperCase();
+					chrome.storage.local.set({"hotkeys":hotkeys});
+				}
+			}
+		}); 
+	}
 });

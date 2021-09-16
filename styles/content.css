@@ -63,3 +63,16 @@
     font-size: 13px;
     color: #b3b3b3;
 }
+
+.correct > #wkundo-sendButton {
+    background-color: #88cc00 !important;
+}
+
+.incorrect > #wkundo-sendButton {
+    background-color: #f03 !important;
+
+}
+
+.correct > #wkundo-sendButton, .incorrect > #wkundo-sendButton {
+    color: #fff;
+}

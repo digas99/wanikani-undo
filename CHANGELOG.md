@@ -7,3 +7,4 @@ Not Released Yet
 - Implemented some shortcut keys:
 	- **U:** Undo a mistake
 	- **X:** Disable/enable extension in real time
+	- **Esc:** Remove cursor from answer input and stop typing

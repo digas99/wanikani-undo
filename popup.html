@@ -5,9 +5,51 @@
 	<meta name="viewport" content="width=device-width">
 	<title>WKUndo</title>
 	<link rel="stylesheet" href="styles/popup-styles.css">
+	<link rel="stylesheet" href="styles/popup-wkundo.css">
 	<script src="scripts/popup.js"></script>
+	<script src="scripts/static.js"></script>
 	<script src="scripts/functions.js"></script>
 </head>
 <body style="font-family: sans-serif">
+	<div id="settingsContent">
+		<div id="settingsOptionsWrapper">
+			<div class="settingsSection bellow-border">
+				<p>Review Session Interface</p>
+				<div>
+					<label class="settingsItemLabel" for="settings-auto-show-item-info">Auto Show Item Info</label>
+					<div class="checkbox_wrapper">
+						<input type="checkbox" id="settings-auto-show-item-info" class="settingsItemInput clickable">
+					</div>
+				</div>
+				<div class="disabled-settings">
+					<label class="settingsItemLabel" for="settings-two-click-wrong-answer">Two Click Wrong Answer</label>
+					<div class="checkbox_wrapper">
+						<input type="checkbox" id="settings-two-click-wrong-answer" class="settingsItemInput clickable">
+					</div>
+				</div>
+			</div>
+			<div class="settingsSection bellow-border">
+				<p>Hotkeys</p>
+				<div>
+					<label class="settingsItemLabel" for="settings-hotkey-undo-mistake">Undo Mistake</label>
+					<div class="checkbox_wrapper">
+						<input type="checkbox" checked id="settings-hotkey-undo-mistake" class="settingsItemInput clickable settings-hotkey">
+					</div>
+				</div>
+				<div>
+					<label class="settingsItemLabel" for="settings-hotkey-extension">Enable/Disable Extension</label>
+					<div class="checkbox_wrapper">
+						<input type="checkbox" checked id="settings-hotkey-extension" class="settingsItemInput clickable settings-hotkey">
+					</div>
+				</div>
+				<div>
+					<label class="settingsItemLabel" for="settings-hotkey-item-info">Open/Close Item Info</label>
+					<div class="checkbox_wrapper">
+						<input type="checkbox" checked id="settings-hotkey-item-info" class="settingsItemInput clickable settings-hotkey">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
