@@ -1,18 +1,20 @@
 'use strict';
 
 (() => {	
-	chrome.storage.local.get(["extension-disabled", "auto-show-item-info", "hotkeys"], result => {
+	chrome.storage.local.get([... Object.keys(static_settings), "extension-disabled", "hotkeys"], result => {
 		let sendClicks = 0;
 		let undo = false;
 		
 		const extensionDisabled = result["extension-disabled"];
 		const autoShowItemInfo = result["auto-show-item-info"];
+		const cloneInputMark = result["clone-input-mark"];
 		const hotkeys = result["hotkeys"] ? result["hotkeys"] : static_hotkeysMap; 
 
 		// get input and button
-		const input = document.getElementById("user-response");
+		let input = document.getElementById("user-response");
 		const parent = input.parentElement;
 		const btn = parent.getElementsByTagName("BUTTON")[0];
+		let cloneParent;
 		let questionType = document.getElementById("question-type").classList[0];
 		// observe it until question type has the class
 		const questionTypeElem = document.getElementById("question-type");
@@ -27,7 +29,7 @@
 								cloneInput.placeholder = "答え";
 							}
 						}
-						cloneInput.focus();
+						if (cloneInput) cloneInput.focus();
 						// observer served its purpose, so disconnect it
 						observer.disconnect();
 					}
@@ -54,8 +56,9 @@
 			if (extensionDisabled) logo.classList.add("wkundo-disabled");
 			logo.addEventListener("click", () => {
 				let disabled;
-				if (parent && !parent.classList.contains("correct") && !parent.classList.contains("incorrect")) {
-					if (!logo.classList.contains("wkundo-disabled") && (document.getElementById("wkundo-input") && !document.getElementById("wkundo-input").style.backgroundColor)) {
+				const thisParent = cloneParent ? cloneParent : parent;
+				if (thisParent && !["correct" ,"incorrect"].some(className => thisParent.classList.contains(className))) {
+					if (!logo.classList.contains("wkundo-disabled")) {
 						logo.classList.add("wkundo-disabled");
 						disabled = true;
 						
@@ -76,12 +79,8 @@
 			});
 			
 			logo.addEventListener("mouseover", () => {
-				const cloneInput = document.getElementById("wkundo-input");
-				const input = document.getElementById("user-response");
-				const parent = input.parentElement;
-				if ((cloneInput && cloneInput.style.backgroundColor)
-					|| (input && input.style.backgroundColor)
-					|| (parent && (parent.classList.contains("correct") || parent.classList.contains("incorrect"))))
+				const thisParent = cloneParent ? cloneParent : parent;
+				if (thisParent && ["correct" ,"incorrect"].some(className => thisParent.classList.contains(className)))
 						logo.style.cursor = "not-allowed";
 				else logo.style.removeProperty("cursor");
 			});
@@ -95,8 +94,10 @@
 				cInput.style.removeProperty("pointer-events")	
 				sendClicks = 0;
 				cInput.focus();
-				if (parent) parent.classList.remove(parent.classList[0]);
+				if (cloneParent) cloneParent.classList.remove(cloneParent.classList[0]);
 				else document.getElementById("user-response").parentElement.remove(document.getElementById("user-response").classList[0]);
+				questionType = document.getElementById("question-type").classList[0];
+				cInput.placeholder = questionType == 'reading' ? "答え" : "Your Response";
 			}
 		}
 
@@ -106,6 +107,7 @@
 			const cloneBtn = document.getElementById("wkundo-sendButton");
 			const value = cloneInput.value.toLowerCase();
 			cloneInput.blur();
+
 			console.log("input: ", input.value, "senclicks: ", sendClicks);
 
 			if (value == '') cloneInput.focus();
@@ -133,7 +135,7 @@
 				// correct answer
 				if (document.getElementById("wkundo-result").innerText !== "false") {
 					if (sendClicks == 1) {
-						if (parent) parent.classList.add("correct");
+						if (cloneParent) cloneParent.classList.add("correct");
 						else document.getElementById("user-response").parentElement.classList.add("correct");
 						cloneInput.style.pointerEvents = "none";
 
@@ -154,11 +156,22 @@
 				}
 				// incorrect answer
 				else {
+					// check if there is any non kana character in user's input
+					if (questionType == 'reading') {
+						for (let c of value) {
+							if (!Object.values(kana).includes(c)) {
+								sendClicks = 0;
+								cloneInput.focus();
+								return;
+							}
+						}
+					}
+
 					// first send, give the option to undo
 					if (sendClicks == 1) {
 						document.getElementById("option-undo").classList.remove("disabled");
 
-						if (parent) parent.classList.add("incorrect");
+						if (cloneParent) cloneParent.classList.add("incorrect");
 						else document.getElementById("user-response").parentElement.classList.add("incorrect");
 						cloneInput.style.pointerEvents = "none";
 					}
@@ -169,14 +182,15 @@
 							input.value = value;
 							// prevent user from going back
 							document.getElementById("option-undo").classList.add("disabled");
+							btn.click();
 						}
-
-						btn.click();
 
 						// if user clicked 3 times while wrong, then reset styles for the next review
 						if (sendClicks == 3) {
 							resetClones();
 							questionType = document.getElementById("question-type").classList[0];
+							if (!wkSubmit)
+								btn.click();
 						}
 					}
 				}
@@ -195,12 +209,18 @@
 		}
 
 		const setupExtensionContent = () => {
-			if (!(questionType))
-				questionType = document.getElementById("question-type").classList[0];
+			questionType = document.getElementById("question-type").classList[0];
 
-			if (input && btn) {
+			const answerForm = document.getElementById("answer-form");
+			if (input && btn && answerForm) {
+				const cloneForm = document.createElement("form");
+				answerForm.appendChild(cloneForm);
+				const cloneFieldset = document.createElement("fieldset");
+				cloneParent = cloneFieldset;
+				cloneForm.appendChild(cloneFieldset);
 				const cloneInput = input.cloneNode();
 				cloneInput.id = "wkundo-input";
+				if (cloneInputMark) cloneInput.style.borderLeft = "8px solid #4eabf9";
 				if (questionType == 'reading') cloneInput.placeholder = "答え";
 				const cloneBtn = document.createElement("div");
 				cloneBtn.id = "wkundo-sendButton";
@@ -209,21 +229,14 @@
 				const cloneBtnChild = btn.childNodes[0].cloneNode();
 				cloneBtnChild.style.pointerEvents = "none";
 				cloneBtn.appendChild(cloneBtnChild);
-	
+
 				cloneInput.addEventListener("input", () => {	
 					if (!(questionType))
 						questionType = document.getElementById("question-type").classList[0];
 	
 					// change text to kana
-					if (questionType == "reading") {
-						let finalValue = "";
-						const split = separateRomaji(cloneInput.value);
-						for (const word of split) {
-							const kanaValue = kana[word];
-							finalValue += kanaValue ? kanaValue : word;
-						}
-						cloneInput.value = finalValue;
-					}
+					if (questionType == "reading")
+						cloneInput.value = convertToKana(cloneInput.value);
 				});
 	
 				cloneBtn.addEventListener("click", () => submitAction(false));
@@ -231,13 +244,14 @@
 				input.value = "";
 				sendClicks = 0;
 
-				// add clones
-				parent.appendChild(cloneInput);
-				parent.appendChild(cloneBtn);
-	
-				// hide original elements
-				input.style.display = "none";
-				btn.style.display = "none";
+				if (answerForm.children.length >= 2) {
+					// hide original elements
+					answerForm.children[0].style.display = "none";
+
+					// add clones
+					cloneFieldset.appendChild(cloneInput);
+					cloneFieldset.appendChild(cloneBtn);
+				}
 
 				// additional button
 				const buttonsWrapper = document.getElementById("additional-content").getElementsByTagName("UL")[0];
@@ -275,15 +289,15 @@
 				undoButton.parentElement.childNodes.forEach(node => node.style.removeProperty('width'));
 				undoButton.remove();
 			}
-			const undoInput = document.getElementById("wkundo-input");
-			if (undoInput) undoInput.remove();
-			const undoSend = document.getElementById("wkundo-sendButton");
-			if (undoSend) undoSend.remove();
+			
+			const answerForm = document.getElementById("answer-form");
+			if (answerForm && answerForm.children.length >= 2) {
+				// remove clones
+				answerForm.children[1].remove();
 
-			const realInput = document.getElementById("user-response");
-			if (realInput) realInput.style.removeProperty('display');
-			const realButton = realInput.parentElement.getElementsByTagName("BUTTON")[0];
-			if (realButton) realButton.style.removeProperty('display');
+				// display original
+				answerForm.children[0].style.removeProperty("display");
+			}
 
 			input.value = "";
 			sendClicks = 0;
@@ -295,12 +309,10 @@
 
 		document.addEventListener("keydown", e => {
 			const key = e.key;
-			console.log(e);
+			// console.log(e);
 
-			if (document.getElementById("wkundo-sendButton") && key == 'Enter') {
-				console.log("here");
+			if (document.getElementById("wkundo-sendButton") && key == 'Enter')
 				submitAction(true);
-			}
 
 			// force char deleting with backspace
 			if (key == "Backspace") {
@@ -338,16 +350,6 @@
 								"bubbles": true,
 								"cancelable": false
 							}));
-			}
-
-			if (key == hotkeys["settings-hotkey-item-info"].toLowerCase() || key == hotkeys["settings-hotkey-item-info"]) {
-				const itemInfo = document.getElementById("option-item-info");
-				if (itemInfo && !itemInfo.classList.contains("disabled"))
-					itemInfo.dispatchEvent(new MouseEvent("click", {
-						"view": window,
-						"bubbles": true,
-						"cancelable": false
-					})); 
 			}
 		});
 		

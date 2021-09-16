@@ -810,11 +810,7 @@ transform: rotate(134deg);
     display: grid;
 	overflow: auto;
     max-height: 516px;
-	margin-bottom: 13px;
-}
-
-#settingsContent>div {
-	margin: 10px 0;
+	margin: 13px 0;
 }
 
 .settingsSection {

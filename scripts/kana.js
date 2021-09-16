@@ -1,5 +1,4 @@
 const separateRomaji = (input) => {
-	const vowels = ["a", "i", "u", "e", "o"];
 	let finalArray = [];
 	let word = "";
 
@@ -7,7 +6,7 @@ const separateRomaji = (input) => {
 		const c = input.charAt(i);
 		word += c;
 		// if it is hiragana/katakana/punctuation, or a value, or the last char
-		if (c.match(/[\u3000-\u30ff]/) || vowels.includes(c) || i == input.length-1) {
+		if (c.match(/[\u3000-\u30ff]/) || i == input.length-1) {
 			finalArray.push(word);
 			word = "";
 		}
@@ -15,6 +14,23 @@ const separateRomaji = (input) => {
 	}
 		
 	return finalArray;
+}
+
+const convertToKana = (text) => {
+	let finalValue = "";
+	const vowels = ["a", "i", "u", "e", "o", "A", "I", "U", "E", "O"];
+	const split = separateRomaji(text);
+	for (const word of split) {
+		let kanaValue = kana[word];
+		// handle situations like 'kko' -> 'っこ'
+		if (!kanaValue && word.length === 3) {
+			if (word.charAt[0] === word.charAt[1] && vowels.includes(word.charAt(2))) {
+				kanaValue = kana[/[a-z]/.test(word.charAt(0)) ? 'll' : 'LL']+kana[word.slice(1)];
+			}
+		}
+		finalValue += kanaValue ? kanaValue : word;
+	}
+	return finalValue;
 }
 
 const kana = {

@@ -12,7 +12,7 @@
     "content_scripts": [
         {
             "matches": ["https://www.wanikani.com/review/session"],
-            "js": ["scripts/content.js", "scripts/kana.js", "scripts/static.js"],
+            "js": ["scripts/static.js", "scripts/content.js", "scripts/kana.js"],
             "css": ["styles/content.css"]
         }
     ],

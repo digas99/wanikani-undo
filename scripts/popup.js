@@ -118,29 +118,15 @@ window.onload = () => {
 	title.textContent = "WaniKani Undo";
 	logoDiv.appendChild(title);
 
-	// setup review session interface checkbox values
-	const settings = ["auto-show-item-info", "two-click-wrong-answer"];
-	chrome.storage.local.get(settings, result => {
-		settings.forEach(id => {
-			let value = result[id];
-			if (value == undefined) {
-				value = false;
-				chrome.storage.local.set({[id]:value});
-			}
+	// setups
+	chrome.storage.local.get([...Object.keys(static_settings), "hotkeys"], result => {
+		console.log(result);
+		for (let id in static_settings) {
 			const checkbox = document.getElementById("settings-"+id);
-			console.log(checkbox);
-			console.log(value);
-			if (checkbox) checkbox.checked = value;
-		});
-	});
-
-	// setup hotkeys
-	chrome.storage.local.get(["hotkeys"], result => {
-		let hotkeys = result["hotkeys"];
-		if (!hotkeys) {
-			hotkeys = static_hotkeysMap;
-			chrome.storage.local.set({"hotkeys":hotkeys});
+			if (checkbox) checkbox.checked = result[id];
 		}
+
+		let hotkeys = result["hotkeys"];
 		const hotkeysInputs = document.getElementsByClassName("settings-hotkey");
 		if (hotkeys && hotkeysInputs.length > 0) {
 			Array.from(hotkeysInputs).forEach(input => document.styleSheets[0].insertRule(`#${input.id}:after { content:'${hotkeys[input.id]}';}`));
@@ -264,7 +250,7 @@ document.addEventListener("click", e => {
 	}
 
 
-	if (["settings-auto-show-item-info", "settings-two-click-wrong-answer"].includes(targetElem.id))
+	if (Object.keys(static_settings).includes(targetElem.id.split("settings-")[1]))
 		chrome.storage.local.set({[targetElem.id.split("settings-")[1]]:targetElem.checked ? true : false});
 
 	if (targetElem.classList.contains("settings-hotkey")) {

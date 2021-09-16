@@ -17,3 +17,9 @@
     text-align: center;
     font-weight: 900;
 }
+
+#settings-apply-msg {
+	font-size: 11px;
+    text-align: center;
+    color: #929292;
+}
