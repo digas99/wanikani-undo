@@ -1,5 +1,5 @@
 # Changelog v0.1.0
-Not Released Yet
+Released on 17/09/21
 
 ## Content
 - Button to undo mistake

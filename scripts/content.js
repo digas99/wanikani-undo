@@ -6,9 +6,9 @@
 		let undo = false;
 		
 		const extensionDisabled = result["extension-disabled"];
-		const autoShowItemInfo = result["auto-show-item-info"];
-		const cloneInputMark = result["clone-input-mark"];
-		const hotkeys = result["hotkeys"] ? result["hotkeys"] : static_hotkeysMap; 
+		const autoShowItemInfo = result["auto-show-item-info"] !== undefined ? result["auto-show-item-info"] : static_settings["auto-show-item-info"];
+		const cloneInputMark = result["clone-input-mark"] !== undefined ? result["clone-input-mark"] : static_settings["clone-input-mark"];
+		const hotkeys = result["hotkeys"] !== undefined ? result["hotkeys"] : static_hotkeysMap; 
 
 		// get input and button
 		let input = document.getElementById("user-response");

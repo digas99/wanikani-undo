@@ -123,11 +123,12 @@ window.onload = () => {
 		console.log(result);
 		for (let id in static_settings) {
 			const checkbox = document.getElementById("settings-"+id);
-			if (checkbox) checkbox.checked = result[id];
+			if (checkbox) checkbox.checked = result[id] ? result[id] : static_settings[id];
 		}
 
 		let hotkeys = result["hotkeys"];
 		const hotkeysInputs = document.getElementsByClassName("settings-hotkey");
+		if (!hotkeys) hotkeys = static_hotkeysMap;
 		if (hotkeys && hotkeysInputs.length > 0) {
 			Array.from(hotkeysInputs).forEach(input => document.styleSheets[0].insertRule(`#${input.id}:after { content:'${hotkeys[input.id]}';}`));
 		}
