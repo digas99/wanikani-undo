@@ -6,7 +6,7 @@ This is an unofficial extension for the browser to undo wrong answers when doing
 #### VERSION 0.1.0
 
 ## Table of contents:
-1. [Latest Features](#changelog-v010)
+1. [Latest Features](#changelog-v011)
 2. [Usage Guide](#usage-guide)
 	* 2.1 [Undo Answer](#undo-answer)
 	* 2.2 [Disable Extension](#disable-extension)
@@ -14,10 +14,15 @@ This is an unofficial extension for the browser to undo wrong answers when doing
 	* 2.4 [Settings](#settings)
 3. [Pictures](#pictures)
 
-# Changelog v0.1.0
+## Changelog v0.1.1
+
+### Content
+- Fixed bugs when transforming user input into kana during reviews
+
+## Changelog v0.1.0
 Released on 17/09/21
 
-## Content
+### Content
 - Button to undo mistake
 - Button to enable/disable extension in real time
 - Implemented some shortcut keys:
@@ -26,7 +31,7 @@ Released on 17/09/21
 	- **Esc:** Remove cursor from answer input and stop typing
 	- **Enter:** Put cursor back into answer input (only if answer input is empty)
 
-## Popup
+### Popup
 - Setup of some settings and hotkeys
 
 #### [(All changelogs)](CHANGELOG.md)
