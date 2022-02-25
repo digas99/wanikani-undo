@@ -17,7 +17,7 @@ if [ -f "$FILENAME" ]; then
 	tag=\"version\"
 	if [ "$key" == "$tag" ]; then
 		# delete old zip files
-		rm wk_*
+		rm wku_*
 
 		# format version string from '"0.0.1",' to '001'
 		formated=$(echo "$value" | sed 's/[\.\,\ "]//g') 
