@@ -1,4 +1,4 @@
-const separateRomaji = (input) => {
+const separateRomaji = input => {
 	let finalArray = [];
 	let word = "";
 
@@ -16,18 +16,18 @@ const separateRomaji = (input) => {
 	return finalArray;
 }
 
-const convertToKana = (text) => {
+const convertToKana = text => {
 	let finalValue = "";
 	const vowels = ["a", "i", "u", "e", "o", "A", "I", "U", "E", "O"];
 	const split = separateRomaji(text);
 	for (const word of split) {
 		let kanaValue = kana[word];
-		// handle situations like 'kko' -> 'っこ'
-		if (!kanaValue && word.length === 3) {
-			if (word.charAt[0] === word.charAt[1] && vowels.includes(word.charAt(2))) {
-				kanaValue = kana[/[a-z]/.test(word.charAt(0)) ? 'll' : 'LL']+kana[word.slice(1)];
-			}
-		}
+		// handle situations like 'kanji' -> 'kannji'
+		if (!kanaValue && word.length > 1 && word.charAt(0) == "n" && !vowels.includes(word.charAt(1)) && word.charAt(1) !== 'y')
+			kanaValue = kana[/[a-z]/.test(word.charAt(0)) ? 'nn' : 'NN']+word.charAt(1);
+		// handle situations like 'kko' -> 'っこ' and 'shussha' -> 'しゅっしゃ'
+		else if (!kanaValue && word.length >=3 && word.charAt(0) === word.charAt(1) && vowels.includes(word.charAt(word.length-1)))
+			kanaValue = kana[/[a-z]/.test(word.charAt(0)) ? 'll' : 'LL']+kana[word.slice(1)];
 		finalValue += kanaValue ? kanaValue : word;
 	}
 	return finalValue;
