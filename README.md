@@ -1,4 +1,10 @@
 # WaniKani Undo
+
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ohlcafdanoiigfilobpcmpjpnnaaokif.svg?style=flat-square&color=orange)](https://chrome.google.com/webstore/detail/wanikani-undo/ohlcafdanoiigfilobpcmpjpnnaaokif)
+[![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/ohlcafdanoiigfilobpcmpjpnnaaokif.svg?style=flat-square&color=orange)](https://chrome.google.com/webstore/detail/wanikani-undo/ohlcafdanoiigfilobpcmpjpnnaaokif)
+[![Mozilla Addons](https://img.shields.io/amo/v/wanikani-undo.svg?style=flat-square&color=blue)](https://addons.mozilla.org/en-US/firefox/addon/wanikani-undo/)
+[![Mozilla Addons Users](https://img.shields.io/amo/users/wanikani-undo.svg?style=flat-square&color=blue)](https://addons.mozilla.org/en-US/firefox/addon/wanikani-undo/)
+
 ### Unofficial Browser Extension
 
 This is an unofficial extension for the browser to undo wrong answers when doing reviews at [WaniKani.com](https://www.wanikani.com/).
