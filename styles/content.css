@@ -1,6 +1,15 @@
 /* additional button */
-.icon-undo::before {
-	content: "\238C";
+.wkundo-icon-undo::before {
+	content: "\21bb";
+}
+
+.wkundo-icon-skip::before {
+    content: '\ff1f';
+}
+
+.wkundo-icon::before {
+    font-style: initial;
+    font-weight: bold;
 }
 
 #wkundo-sendButton {
@@ -75,4 +84,10 @@
 
 .correct > #wkundo-sendButton, .incorrect > #wkundo-sendButton {
     color: #fff;
+}
+
+.wkundo-hide-text {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
 }

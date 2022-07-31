@@ -121,6 +121,7 @@ window.onload = () => {
 	// setups
 	chrome.storage.local.get([...Object.keys(static_settings), "hotkeys"], result => {
 		console.log(result);
+
 		for (let id in static_settings) {
 			const checkbox = document.getElementById("settings-"+id);
 			if (checkbox) checkbox.checked = result[id] ? result[id] : static_settings[id];
@@ -129,6 +130,24 @@ window.onload = () => {
 		let hotkeys = result["hotkeys"];
 		const hotkeysInputs = document.getElementsByClassName("settings-hotkey");
 		if (!hotkeys) hotkeys = static_hotkeysMap;
+
+		// check if all settings are updated
+		let newSettings = {};
+		Object.keys(static_settings).forEach(key => {
+			if (!result[key]) newSettings[key] = static_settings[key];
+		});
+		if (Object.keys(newSettings).length > 0) chrome.storage.local.set(newSettings);
+
+		// check if hotkeys are updated
+		let keyChanges = false;
+		Object.keys(static_hotkeysMap).forEach(key => {
+			if (!hotkeys[key]) {
+				hotkeys[key] = static_hotkeysMap[key];
+				keyChanges = true;
+			}
+		});
+		if (keyChanges) chrome.storage.local.set({"hotkeys": hotkeys});
+
 		if (hotkeys && hotkeysInputs.length > 0) {
 			Array.from(hotkeysInputs).forEach(input => document.styleSheets[0].insertRule(`#${input.id}:after { content:'${hotkeys[input.id]}';}`));
 		}
@@ -254,7 +273,7 @@ document.addEventListener("click", e => {
 	if (Object.keys(static_settings).includes(targetElem.id.split("settings-")[1]))
 		chrome.storage.local.set({[targetElem.id.split("settings-")[1]]:targetElem.checked ? true : false});
 
-	if (targetElem.classList.contains("settings-hotkey")) {
+	if (targetElem.classList.contains("settings-hotkey") && targetElem.classList.contains("clickable")) {
 		e.preventDefault();
 	
 		document.styleSheets[0].insertRule(`#${targetElem.id}:after { content:'_' !important;}`,document.styleSheets[0].cssRules.length);

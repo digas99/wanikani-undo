@@ -1,11 +1,13 @@
 const static_hotkeysMap = {
 	"settings-hotkey-undo-mistake":"U",
+	"settings-hotkey-skip":"⏎",
 	"settings-hotkey-extension":"X"
 }
 
 const static_settings = {
 	"auto-show-item-info": false,
-	"clone-input-mark": true
+	"clone-input-mark": true,
+	"skip-answer": false
 }
 
 chrome.storage.local.get([...Object.keys(static_settings), "hotkeys"], result => {

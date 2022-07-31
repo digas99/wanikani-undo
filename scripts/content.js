@@ -8,7 +8,9 @@
 		const extensionDisabled = result["extension-disabled"];
 		const autoShowItemInfo = result["auto-show-item-info"] !== undefined ? result["auto-show-item-info"] : static_settings["auto-show-item-info"];
 		const cloneInputMark = result["clone-input-mark"] !== undefined ? result["clone-input-mark"] : static_settings["clone-input-mark"];
-		const hotkeys = result["hotkeys"] !== undefined ? result["hotkeys"] : static_hotkeysMap; 
+		const skipAnswer = result["skip-answer"] !== undefined ? result["skip-answer"] : static_settings["skip-answer"];
+		const hotkeys = result["hotkeys"] !== undefined ? result["hotkeys"] : static_hotkeysMap;
+		const skipAnswerDelay = 1500;
 
 		// get input and button
 		let input = document.getElementById("user-response");
@@ -90,22 +92,35 @@
 			const cInput = document.getElementById("wkundo-input");
 			const cBtn = document.getElementById("wkundo-sendButton");
 			if (cInput && cBtn) {
+				// reset send clicks
+				sendClicks = 0;
 				cInput.value = "";
 				cInput.style.removeProperty("pointer-events")	
-				sendClicks = 0;
 				cInput.focus();
 				if (cloneParent) cloneParent.classList.remove(cloneParent.classList[0]);
 				else document.getElementById("user-response").parentElement.remove(document.getElementById("user-response").classList[0]);
+				// update question type and placeholder
 				questionType = document.getElementById("question-type").classList[0];
 				cInput.placeholder = questionType == 'reading' ? "答え" : "Your Response";
+				// remove hidden text if it is the case
+				cInput.classList.remove("wkundo-hide-text");
+				// reset wkundo result
+				document.getElementById("wkundo-result").innerText = '';
 			}
+
+			// activate skip button
+			console.log("skip activated");
+			setTimeout(() => {
+				const skipBtn = document.getElementById("option-skip");
+				if (skipBtn) skipBtn.classList.remove("disabled");
+			}, skipAnswerDelay);
 		}
 
 
 		const submitAction = (wkSubmit) => {
 			const cloneInput = document.getElementById("wkundo-input");
 			const cloneBtn = document.getElementById("wkundo-sendButton");
-			const value = cloneInput.value.toLowerCase();
+			let value = cloneInput.value.toLowerCase();
 			cloneInput.blur();
 
 			console.log("input: ", input.value, "senclicks: ", sendClicks);
@@ -114,6 +129,7 @@
 
 			// if ready to check answer
 			if (value != '' && cloneInput && cloneBtn) {
+				console.log("here");
 				sendClicks++;
 
 				if (sendClicks == 1) {
@@ -131,9 +147,14 @@
 					if (oldScript) oldScript.remove();
 					document.documentElement.appendChild(script);
 				}
+
+				if (sendClicks > 0) {
+					const skipBtn = document.getElementById("option-skip");
+					if (skipBtn) skipBtn.classList.add("disabled");
+				}
 				
 				// correct answer
-				if (document.getElementById("wkundo-result").innerText !== "false") {
+				if (document.getElementById("wkundo-result").innerText == "true") {
 					if (sendClicks == 1) {
 						if (cloneParent) cloneParent.classList.add("correct");
 						else document.getElementById("user-response").parentElement.classList.add("correct");
@@ -167,6 +188,8 @@
 						}
 					}
 
+					console.log(sendClicks, value);
+
 					// first send, give the option to undo
 					if (sendClicks == 1) {
 						document.getElementById("option-undo").classList.remove("disabled");
@@ -182,7 +205,15 @@
 							input.value = value;
 							// prevent user from going back
 							document.getElementById("option-undo").classList.add("disabled");
+							cloneInput.style.pointerEvents = "none";
 							btn.click();
+							
+													
+							// check for answer exception
+							setTimeout(() => {
+								if (document.getElementById("answer-exception"))
+									document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'Enter'})); // click enter to advance
+							}, 500);
 						}
 
 						// if user clicked 3 times while wrong, then reset styles for the next review
@@ -239,7 +270,7 @@
 						cloneInput.value = convertToKana(cloneInput.value);
 				});
 	
-				cloneBtn.addEventListener("click", () => submitAction(false));
+				cloneBtn.addEventListener("click", () => document.dispatchEvent(new KeyboardEvent('keydown', {'key': 'Enter'})));
 
 				input.value = "";
 				sendClicks = 0;
@@ -253,30 +284,61 @@
 					cloneFieldset.appendChild(cloneBtn);
 				}
 
-				// additional button
+				// additional buttons
 				const buttonsWrapper = document.getElementById("additional-content").getElementsByTagName("UL")[0];
 				if (buttonsWrapper) {
 					buttonsWrapper.style.textAlign = "center";
 	
 					// add undo button
-					const li = document.createElement("li");
-					buttonsWrapper.appendChild(li);
-					li.classList.add("disabled");
-					li.id = "option-undo";
-					const span = document.createElement("span");
-					li.appendChild(span);
-					span.title = "Undo";
+					const undoLi = document.createElement("li");
+					buttonsWrapper.appendChild(undoLi);
+					undoLi.classList.add("disabled");
+					undoLi.id = "option-undo";
+					const undoSpan = document.createElement("span");
+					undoLi.appendChild(undoSpan);
+					undoSpan.title = "Undo";
 					// event listener to undo button
-					span.addEventListener("click", () => {
-						if (!li.classList.contains("disabled") && sendClicks == 1) {
+					undoSpan.addEventListener("click", () => {
+						if (!undoLi.classList.contains("disabled") && sendClicks == 1) {
 							resetClones();
-							li.classList.add("disabled");
+							undoLi.classList.add("disabled");
 						}
 					});
-					const i = document.createElement("i");
-					span.appendChild(i);
-					i.classList.add("icon-undo");
+					const undoI = document.createElement("i");
+					undoSpan.appendChild(undoI);
+					undoI.classList.add("wkundo-icon-undo");
 	
+					// add skip button
+					if (skipAnswer) {
+						const skipLi = document.createElement("li");
+						buttonsWrapper.appendChild(skipLi);
+						skipLi.classList.add("disabled");
+						skipLi.id = "option-skip";
+						const skipSpan = document.createElement("span");
+						skipLi.appendChild(skipSpan);
+						skipSpan.title = "Don't Know";
+						// event listener to skip button
+						skipSpan.addEventListener("click", () => {
+							if (!skipLi.classList.contains("disabled") && sendClicks == 0) {
+								// put dummy wrong value in input
+								cloneInput.value = questionType == 'reading' ? 'っ' : ' ';
+								sendClicks = 1;
+								console.log(cloneInput);
+								console.log(cloneInput.value);
+								if (document.getElementById("wkundo-sendButton")) {
+									document.getElementById("wkundo-sendButton").click();
+									cloneInput.classList.add("wkundo-hide-text");
+								}
+							}
+						});
+						const skipI = document.createElement("i");
+						skipSpan.appendChild(skipI);
+						skipI.classList.add("wkundo-icon", "wkundo-icon-skip");					
+						
+						// activate skip button
+						setTimeout(() => skipLi.classList.remove("disabled"), skipAnswerDelay);
+					}
+					
 					// fix all buttons width
 					buttonsWrapper.childNodes.forEach(btn => btn.style.width = (100/buttonsWrapper.childNodes.length)+"%");
 				}
@@ -327,6 +389,14 @@
 					document.getElementById("wkundo-input").blur();
 				else if (document.getElementById("user-response"))
 					document.getElementById("user-response").blur();
+			}
+
+			if (skipAnswer) {
+				const cloneInput = document.getElementById("wkundo-input");
+				if (key == 'Enter' && cloneInput && cloneInput.value == '') {
+					const skipBtn = document.getElementById("option-skip");
+					if (skipBtn) skipBtn.firstChild.click();
+				}
 			}
 
 			const undoElem = document.getElementById("option-undo");

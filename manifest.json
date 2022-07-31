@@ -1,7 +1,7 @@
 {
     "name": "WaniKani Undo",
     "description": "Unoficial extension to undo your wrong reviews at Wanikani.",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "manifest_version": 2,
     "icons": {
         "16":  "logo/logo_bb_16x16.png",

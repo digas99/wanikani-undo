@@ -9,36 +9,24 @@
 
 This is an unofficial extension for the browser to undo wrong answers when doing reviews at [WaniKani.com](https://www.wanikani.com/).
 
-#### VERSION 0.1.0
-
 ## Table of contents:
-1. [Latest Features](#changelog-v011)
+1. [Latest Features](#changelog-v020)
 2. [Usage Guide](#usage-guide)
 	* 2.1 [Undo Answer](#undo-answer)
 	* 2.2 [Disable Extension](#disable-extension)
-	* 2.3 [Shortcut Keys](#shortcut-keys)
-	* 2.4 [Settings](#settings)
+	* 2.3 [Skip Answer](#skip-answer)
+	* 2.4 [Shortcut Keys](#shortcut-keys)
+	* 2.5 [Settings](#settings)
 3. [Pictures](#pictures)
 
-## Changelog v0.1.1
+## Changelog v0.2.0
 
 ### Content
-- Fixed bugs when transforming user input into kana during reviews
-
-## Changelog v0.1.0
-Released on 17/09/21
-
-### Content
-- Button to undo mistake
-- Button to enable/disable extension in real time
-- Implemented some shortcut keys:
-	- **U:** Undo a mistake
-	- **X:** Disable/enable extension in real time
-	- **Esc:** Remove cursor from answer input and stop typing
-	- **Enter:** Put cursor back into answer input (only if answer input is empty)
+- Fixed issue when some answers are wrong but given a retry by Wanikani, the answer input did not go back to normal, but instead stayed red
+- Added possibility to skip answers that the user doesn't know at all. The Skipping is done either through the **Don't Know (?)** button next to the Undo button, or by clicking **Enter** when the text input is empty
 
 ### Popup
-- Setup of some settings and hotkeys
+- Added checkbox to enable the answer skipping feature
 
 #### [(All changelogs)](CHANGELOG.md)
 
@@ -63,18 +51,22 @@ You can disable this extension in real time, meaning, if you decide you don't wa
 
 The same thing goes for enabling it.
 
+### Skip Answer
+While doing reviews, if you don't know an answer to either a reading or a meaning, you can skip it, by either clicking the **Don't Know (?)** button next to the Undo button, or by clicking **Enter** when the text input is empty. This will mark the answer as wrong, but you won't need to write anything.
+
 ### Shortcut Keys:
 There a few shortcut keys that allow you to interact with some features through your keyboard. The default shortcuts are:
 - **U**: Undo a wrong answer   
 - **X**: Disable/enable extension in real time
 - **Esc**: Remove cursor from answer input and stop typing
-- **Enter**: Put cursor back into answer input (only if answer input is empty)
+- **Enter**: Skip answer when you don't know it (only if the answer input is empty)
 
 ### Settings:
 The extension popup has a few settings that can be managed.
 - **Review Session Interface**
 	- **Auto Show Item Info:** open item info immediatly after an answer is confirmed as correct or incorrect
 	- **Distinguish Answer Input:** add a decorative line to the left side of the answer input to indicate that the extension is active
+	- **Skip Answer**: enable feature to skip answer if you don't know it
 - **Hotkeys**
 	- (Change any shortcut key you want)
 
