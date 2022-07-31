@@ -13,8 +13,8 @@ This is an unofficial extension for the browser to undo wrong answers when doing
 1. [Latest Features](#changelog-v020)
 2. [Usage Guide](#usage-guide)
 	* 2.1 [Undo Answer](#undo-answer)
-	* 2.2 [Disable Extension](#disable-extension)
-	* 2.3 [Skip Answer](#skip-answer)
+	* 2.2 [Skip Answer](#skip-answer)
+	* 2.3 [Disable Extension](#disable-extension)
 	* 2.4 [Shortcut Keys](#shortcut-keys)
 	* 2.5 [Settings](#settings)
 3. [Pictures](#pictures)
@@ -51,21 +51,23 @@ This system can, obviously, be exploited in ways that will harm your learning. I
 
 Correct answers cannot be undone.
 
+### Skip Answer
+While doing reviews, if you don't know an answer to either a reading or a meaning, you can skip it, by either clicking the **Don't Know (?)** button next to the Undo button, or by clicking **Enter** when the text input is empty. This will mark the answer as wrong, but you won't need to write anything.
+
+This feature has a 1.5s delay for every subject to avoid missclicks while hiting Enter to get a new subject.
+
 ### Disable Extension:
 You can disable this extension in real time, meaning, if you decide you don't want to be able to undo your answers, even if in the middle of a review session, you either click the extension icon, within the page, in the top right corner, or use a shortcut key (default is 'X')
 
 The same thing goes for enabling it.
-
-### Skip Answer
-While doing reviews, if you don't know an answer to either a reading or a meaning, you can skip it, by either clicking the **Don't Know (?)** button next to the Undo button, or by clicking **Enter** when the text input is empty. This will mark the answer as wrong, but you won't need to write anything.
 
 ### Shortcut Keys:
 There a few shortcut keys that allow you to interact with some features through your keyboard. The default shortcuts are:
 - **U**: Undo a wrong answer   
 - **X**: Disable/enable extension in real time
 - **Esc**: Remove cursor from answer input and stop typing
-- **Enter**: Skip answer when you don't know it (only if the answer input is empty)
-- **Space:** Put cursor back into answer input
+- **Enter (⏎)**: Skip answer when you don't know it (only if the answer input is empty)
+- **Space (⎵)**: Put cursor back into answer input
 
 ### Settings:
 The extension popup has a few settings that can be managed.
@@ -79,3 +81,4 @@ The extension popup has a few settings that can be managed.
 ## Pictures
 ![pic1](images/picture1.jpg)
 ![pic2](images/picture2.jpg)
+![pic3](images/picture3.jpg)
