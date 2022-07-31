@@ -24,9 +24,14 @@ This is an unofficial extension for the browser to undo wrong answers when doing
 ### Content
 - Fixed issue when some answers are wrong but given a retry by Wanikani, the answer input did not go back to normal, but instead stayed red
 - Added possibility to skip answers that the user doesn't know at all. The Skipping is done either through the **Don't Know (?)** button next to the Undo button, or by clicking **Enter** when the text input is empty
+- Changed shortcut keys:
+	- **Enter:** Skip answer when you don't know it (only if the answer input is empty)
+	- **Space:** Put cursor back into answer input
 
 ### Popup
 - Added checkbox to enable the answer skipping feature
+- Added button that links to Reviews page on Wanikani
+
 
 #### [(All changelogs)](CHANGELOG.md)
 
@@ -60,6 +65,7 @@ There a few shortcut keys that allow you to interact with some features through 
 - **X**: Disable/enable extension in real time
 - **Esc**: Remove cursor from answer input and stop typing
 - **Enter**: Skip answer when you don't know it (only if the answer input is empty)
+- **Space:** Put cursor back into answer input
 
 ### Settings:
 The extension popup has a few settings that can be managed.

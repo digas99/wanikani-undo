@@ -79,27 +79,6 @@ window.onload = () => {
 	document.body.appendChild(footer());
 }
 
-const reloadPage = (message, color) => {
-	const wrapper = document.createElement("div");
-	
-	const submitMessage = document.createElement("p");
-	submitMessage.id = "message";
-	submitMessage.style.marginTop = "5px";
-	submitMessage.style.color = color;
-	submitMessage.style.textAlign = "center";
-	submitMessage.innerHTML = message;
-	wrapper.appendChild(submitMessage);
-	
-	// button to ask to reload the page
-	const reloadButton = document.createElement("div");
-	reloadButton.appendChild(document.createTextNode("Reload Page"));
-	reloadButton.className = "button centered";
-	reloadButton.id = "reloadPage";
-	wrapper.appendChild(reloadButton);
-
-	return wrapper;
-}
-
 document.addEventListener("click", e => {
 	const targetElem = e.target;
 

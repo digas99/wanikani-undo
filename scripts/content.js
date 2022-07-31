@@ -385,17 +385,18 @@
 			}
 
 			if (key == 'Escape') {
-				if (document.getElementById("wkundo-input"))
-					document.getElementById("wkundo-input").blur();
-				else if (document.getElementById("user-response"))
-					document.getElementById("user-response").blur();
+				const wkundoInput = document.getElementById("wkundo-input");
+				const userResponse = document.getElementById("user-response");
+				let targetInput = wkundoInput ? wkundoInput : userResponse;
+				if (targetInput)
+					targetInput.blur();
 			}
-
-			if (key == 'Space') {
-				if (document.getElementById("wkundo-input"))
-					document.getElementById("wkundo-input").focus();
-				else if (document.getElementById("user-response"))
-					document.getElementById("user-response").focus();
+			if (key == ' ') {
+				const wkundoInput = document.getElementById("wkundo-input");
+				const userResponse = document.getElementById("user-response");
+				let targetInput = wkundoInput ? wkundoInput : userResponse;
+				if (targetInput)
+					setTimeout(() => targetInput.focus(), 100);
 			}
 
 			if (skipAnswer) {
