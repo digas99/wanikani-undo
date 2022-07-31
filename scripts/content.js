@@ -306,7 +306,7 @@
 					});
 					const undoI = document.createElement("i");
 					undoSpan.appendChild(undoI);
-					undoI.classList.add("wkundo-icon-undo");
+					undoI.classList.add("wkundo-icon", "wkundo-icon-undo");
 	
 					// add skip button
 					if (skipAnswer) {
