@@ -391,6 +391,13 @@
 					document.getElementById("user-response").blur();
 			}
 
+			if (key == 'Space') {
+				if (document.getElementById("wkundo-input"))
+					document.getElementById("wkundo-input").focus();
+				else if (document.getElementById("user-response"))
+					document.getElementById("user-response").focus();
+			}
+
 			if (skipAnswer) {
 				const cloneInput = document.getElementById("wkundo-input");
 				if (key == 'Enter' && cloneInput && cloneInput.value == '') {

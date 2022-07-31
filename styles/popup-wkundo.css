@@ -23,3 +23,22 @@
     text-align: center;
     color: #929292;
 }
+
+#reviews-button {
+	background-color: #4da9f7;
+    text-align: center;
+    font-size: 14px;
+}
+
+#reviews-button a {
+    color: white;
+    font-weight: bold;
+    display: inline-block;
+    width: 100%;
+    padding: 7px 0;
+}
+
+#reviews-button a:after {
+    content: '\2197';
+    padding-left: 3px;
+}

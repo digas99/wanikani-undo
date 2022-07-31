@@ -40,84 +40,7 @@ const footer = () => {
 	return wrapper;
 }
 
-const textInput = (id, iconSrc, placeholder, action) => {
-	const searchArea = document.createElement("div");
-	searchArea.classList.add("searchArea");
-
-	const searchWrapper = document.createElement("div");
-	searchWrapper.id = id+"InputWrapper";
-	searchWrapper.classList.add("textInputWrapper");
-	searchArea.appendChild(searchWrapper);
-
-	const iconImg = document.createElement("img");
-	iconImg.classList.add("textInputIcon");
-	iconImg.src = iconSrc;
-	searchWrapper.appendChild(iconImg);
-
-	const textInput = document.createElement("input");
-	textInput.type = "text";
-	textInput.placeholder = placeholder;
-	textInput.id = id+"Input";
-	if (action) textInput.oninput = action;
-	searchWrapper.appendChild(textInput);
-
-	return searchArea;
-}
-
-const secundaryPage = (titleText, width) => {
-	document.documentElement.style.setProperty('--body-base-width', width+"px");
-
-	document.getElementById("main").style.display = "none";
-	document.getElementById("footer").style.display = "none";
-
-	const main = document.createElement("div");
-	main.id = "secPageMain";
-	document.body.prepend(main); 
-
-	const navbar = document.createElement("div");
-	navbar.classList.add("topNav");
-	main.appendChild(navbar);
-
-	// go back arrow
-	const arrowWrapper = document.createElement("div");
-	arrowWrapper.id = "goBack"
-	const arrow = document.createElement("i");
-	arrow.className = "left clickable";
-	arrow.style.pointerEvents = "none";
-	arrow.style.padding = "4px";
-	arrowWrapper.appendChild(arrow);
-	navbar.appendChild(arrowWrapper); 
-
-	const title = document.createElement("h3");
-	title.style.margin = "0 0 0 10px";
-	title.appendChild(document.createTextNode(titleText));
-	navbar.appendChild(title);
-
-	const content = document.createElement("div");
-	content.style.marginTop = "45px";
-	main.appendChild(content);
-
-	return content;
-}
-
 window.onload = () => {
-	const main = document.createElement("div");
-	main.id = "main";
-	document.body.insertBefore(main, document.body.children[0]);
-
-	// logo
-	const logoDiv = document.createElement("div");
-	main.appendChild(logoDiv);
-	logoDiv.id = "logoWrapper";
-	const logo = document.createElement("img");
-	logo.src="logo/logo.png";
-	logoDiv.appendChild(logo);
-
-	// extension title
-	const title = document.createElement("h2");
-	title.textContent = "WaniKani Undo";
-	logoDiv.appendChild(title);
-
 	// setups
 	chrome.storage.local.get([...Object.keys(static_settings), "hotkeys"], result => {
 		console.log(result);
@@ -177,98 +100,8 @@ const reloadPage = (message, color) => {
 	return wrapper;
 }
 
-const submitAction = () => {
-	let invalidKey = false;
-	const msg = document.getElementById("message");
-	if (msg)
-		msg.remove();
-
-	// check if key is valid
-	const apiKey = document.getElementById("apiKeyInput").value.trim();
-	const splitKey = apiKey.split("-");
-	const keyPartsLength = [8, 4, 4, 4, 12];
-	let keyPart, partLength;
-	for (let i = 0; i < keyPartsLength.length; i++) {
-		keyPart = splitKey[i];
-		partLength = keyPartsLength[i];
-		if (!keyPart || keyPart.length !== partLength) {
-			invalidKey = true;
-			break;
-		}
-	}
-
-	const main = document.getElementById("main");
-
-	if (!invalidKey) {
-		chrome.storage.local.set({"api_key": apiKey});
-		const apiInputWrapper = document.getElementsByClassName("apiKey_wrapper")[0];
-		if (apiInputWrapper)
-			apiInputWrapper.remove();
-
-		main.appendChild(reloadPage("The API key was accepted!", "green"));
-	}
-	else {
-		const submitMessage = document.createElement("p");
-		main.appendChild(submitMessage);
-		submitMessage.id = "message";
-		submitMessage.style.marginTop = "5px";	
-		submitMessage.style.color = "red";
-		submitMessage.appendChild(document.createTextNode("The API key is invalid!"));
-	}
-}
-
 document.addEventListener("click", e => {
 	const targetElem = e.target;
-	
-	if (targetElem.id === "submit")
-		submitAction();
-
-	if (targetElem.id === "reloadPage") {
-		chrome.tabs.query({currentWindow: true, active: true}, (tabs) => {
-			var activeTab = tabs[0];
-			chrome.tabs.sendMessage(activeTab.id, {reloadPage:"true"}, () => window.chrome.runtime.lastError);
-			window.location.reload();
-		});
-	}
-
-	if (targetElem.id === "whatIsAPIKey") {
-		const content = secundaryPage("API Key", 250);
-
-		for (const text of ["A WaniKani API Key is a token that is meant to give you access to all the content provided by WaniKani through a third party application (like this one).", "You can create your API Key on <a href='https://www.wanikani.com/' target='_blank'>WaniKani official website</a> through the following steps:"]) {
-			const pWrapper = document.createElement("div");
-			pWrapper.style.marginTop = "6px";
-			content.appendChild(pWrapper);
-			const p = document.createElement("p");
-			p.innerHTML = text;
-			pWrapper.appendChild(p);
-		}
-
-		const stepText = ["<strong>1-</strong> Click on your photo on the navigation bar anywhere on the website, and then click <strong>API Tokens</strong>.", "<strong>2-</strong>  Click on <strong>Generate a new token</strong>, give it any name you want, and then copy it and paste it here in the extension."];
-		const imagesSrc = ["../images/apitoken_1.png", "../images/apitoken_2.png"]
-
-		for (let i = 0; i < stepText.length; i++) {
-			const wrapper = document.createElement("div");
-			wrapper.classList.add("apiKeyStep");
-			content.appendChild(wrapper);
-			const p = document.createElement("p");
-			p.style.padding = "3px";
-			p.innerHTML = stepText[i];
-			wrapper.appendChild(p);
-	
-			const img = document.createElement("img");
-			img.src = imagesSrc[i];
-			img.style.width = "100%";
-			wrapper.appendChild(img);
-		}
-	}
-
-	if (targetElem.id === "goBack") {
-		document.getElementById("secPageMain").remove();
-		document.getElementById("main").style.display = "inherit";
-		document.getElementById("footer").style.display = "inherit";
-		document.documentElement.style.setProperty('--body-base-width', '250px');
-	}
-
 
 	if (Object.keys(static_settings).includes(targetElem.id.split("settings-")[1]))
 		chrome.storage.local.set({[targetElem.id.split("settings-")[1]]:targetElem.checked ? true : false});
@@ -295,8 +128,6 @@ document.addEventListener("click", e => {
 
 document.addEventListener("keydown", e => {
 	const key = e.key;
-
-	if (key == 'Enter') submitAction();
 
 	const newHotkeyMsg = document.getElementById("typeNewKey-msg");
 	if (newHotkeyMsg && key.length == 1) {

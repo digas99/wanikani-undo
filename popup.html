@@ -11,52 +11,59 @@
 	<script src="scripts/functions.js"></script>
 </head>
 <body style="font-family: sans-serif">
-	<div id="settingsContent">
-		<div id="settingsOptionsWrapper">
-			<div class="settingsSection bellow-border">
-				<p>Review Session Interface</p>
-				<div>
-					<label class="settingsItemLabel" for="settings-auto-show-item-info">Auto Show Item Info</label>
-					<div class="checkbox_wrapper">
-						<input type="checkbox" id="settings-auto-show-item-info" class="settingsItemInput clickable">
-					</div>
-				</div>
-				<div>
-					<label class="settingsItemLabel" for="settings-clone-input-mark">Distinguish Answer Input</label>
-					<div class="checkbox_wrapper">
-						<input type="checkbox" id="settings-clone-input-mark" class="settingsItemInput clickable">
-					</div>
-				</div>
-				<div title="Mark as wrong when you don't have any idea of what the answer is.">
-					<label class="settingsItemLabel" for="settings-skip-answer">Don't Know Answer</label>
-					<div class="checkbox_wrapper">
-						<input type="checkbox" id="settings-skip-answer" class="settingsItemInput clickable">
-					</div>
-				</div>
-			</div>
-			<div class="settingsSection bellow-border">
-				<p>Hotkeys</p>
-				<div>
-					<label class="settingsItemLabel" for="settings-hotkey-undo-mistake">Undo Mistake</label>
-					<div class="checkbox_wrapper">
-						<input type="checkbox" checked id="settings-hotkey-undo-mistake" class="settingsItemInput clickable settings-hotkey">
-					</div>
-				</div>
-				<div style="cursor:not-allowed;" title="Enter">
-					<label style="pointer-events: none;" class="settingsItemLabel" for="settings-hotkey-skip">Don't Know Answer</label>
-					<div class="checkbox_wrapper">
-						<input style="padding: 2px 1px 0 0; pointer-events: none;" type="checkbox" checked id="settings-hotkey-skip" class="settingsItemInput settings-hotkey">
-					</div>
-				</div>
-				<div>
-					<label class="settingsItemLabel" for="settings-hotkey-extension">Enable/Disable Extension</label>
-					<div class="checkbox_wrapper">
-						<input type="checkbox" checked id="settings-hotkey-extension" class="settingsItemInput clickable settings-hotkey">
-					</div>
-				</div>
-			</div>
+	<div id="main">
+		<div id="logoWrapper">
+			<img src="logo/logo.png">
+			<h2>Wanikani Undo</h2>
 		</div>
-		<p id="settings-apply-msg">Reviews page needs to reload for changes to apply</p>
+		<div id="reviews-button" class="clickable"><a target="_blank" href="https://www.wanikani.com/review">Reviews</a></div>
+		<div id="settingsContent">
+			<div id="settingsOptionsWrapper">
+				<div class="settingsSection bellow-border">
+					<p>Review Session Interface</p>
+					<div>
+						<label class="settingsItemLabel" for="settings-auto-show-item-info">Auto Show Item Info</label>
+						<div class="checkbox_wrapper">
+							<input type="checkbox" id="settings-auto-show-item-info" class="settingsItemInput clickable">
+						</div>
+					</div>
+					<div>
+						<label class="settingsItemLabel" for="settings-clone-input-mark">Distinguish Answer Input</label>
+						<div class="checkbox_wrapper">
+							<input type="checkbox" id="settings-clone-input-mark" class="settingsItemInput clickable">
+						</div>
+					</div>
+					<div title="Mark as wrong when you don't have any idea of what the answer is.">
+						<label class="settingsItemLabel" for="settings-skip-answer">Don't Know Answer</label>
+						<div class="checkbox_wrapper">
+							<input type="checkbox" id="settings-skip-answer" class="settingsItemInput clickable">
+						</div>
+					</div>
+				</div>
+				<div class="settingsSection bellow-border">
+					<p>Hotkeys</p>
+					<div>
+						<label class="settingsItemLabel" for="settings-hotkey-undo-mistake">Undo Mistake</label>
+						<div class="checkbox_wrapper">
+							<input type="checkbox" checked id="settings-hotkey-undo-mistake" class="settingsItemInput clickable settings-hotkey">
+						</div>
+					</div>
+					<div style="cursor:not-allowed;" title="Enter">
+						<label style="pointer-events: none;" class="settingsItemLabel" for="settings-hotkey-skip">Don't Know Answer</label>
+						<div class="checkbox_wrapper">
+							<input style="padding: 2px 1px 0 0; pointer-events: none;" type="checkbox" checked id="settings-hotkey-skip" class="settingsItemInput settings-hotkey">
+						</div>
+					</div>
+					<div>
+						<label class="settingsItemLabel" for="settings-hotkey-extension">Enable/Disable Extension</label>
+						<div class="checkbox_wrapper">
+							<input type="checkbox" checked id="settings-hotkey-extension" class="settingsItemInput clickable settings-hotkey">
+						</div>
+					</div>
+				</div>
+			</div>
+			<p id="settings-apply-msg">Reviews page needs to reload for changes to apply</p>
+		</div>
 	</div>
 </body>
 </html>
